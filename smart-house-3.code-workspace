@@ -6,6 +6,9 @@
 		{
 			"name": "worker",
 			"path": "worker"
+		},
+		{
+			"path": "webapp"
 		}
 	],
 	"settings": {}
