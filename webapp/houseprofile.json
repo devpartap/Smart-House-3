@@ -1,0 +1,122 @@
+{
+    "1.1":{
+        "room_id":1.1,
+        "name":"Main Room",
+        "devices":[
+            {
+                "id":0,
+                "name":"Light Right",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":1,
+                "name":"Light Left & Strip",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":2,
+                "name":"Light Middle",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":3,
+                "name":"Outer Led Strip",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":4,
+                "name":"Inner Middle Strip",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":5,
+                "name":"Fan",
+                "type":"fan",
+                "state":false
+            },
+            {
+                "id":6,
+                "name":"Switch One",
+                "type":"switch",
+                "state":false
+            }
+        ]
+    },
+
+    "1.2":{
+        "room_id":1.2,
+        "name":"First Floor Lobby",
+        "devices":[
+            {
+                "id":0,
+                "name":"Light One",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":1,
+                "name":"Light Two",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":2,
+                "name":"Light Three",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":3,
+                "name":"Light Four",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":4,
+                "name":"Light five",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":5,
+                "name":"Fan One",
+                "type":"fan",
+                "state":false
+            },
+            {
+                "id":6,
+                "name":"Fan Two",
+                "type":"fan",
+                "state":false
+            },
+            {
+                "id":7,
+                "name":"Switch One",
+                "type":"switch",
+                "state":false
+            },
+            {
+                "id":8,
+                "name":"Switch Two",
+                "type":"switch",
+                "state":false
+            }
+        ]
+    },
+
+    "layout":{
+        "0":[
+            0.1
+        ],
+        "1":[
+            1.1,
+            1.2
+        ],
+        "2":[]
+    }
+}
