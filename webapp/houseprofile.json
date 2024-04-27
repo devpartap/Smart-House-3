@@ -1,46 +1,46 @@
 {
     "1.1":{
-        "room_id":1.1,
+        "room_id":1.1,  
         "name":"Main Room",
         "devices":[
             {
-                "id":0,
+                "id":1.1,
                 "name":"Light Right",
                 "type":"light",
                 "state":false
             },
             {
-                "id":1,
+                "id":1.2,
                 "name":"Light Left & Strip",
                 "type":"light",
                 "state":false
             },
             {
-                "id":2,
+                "id":1.3,
                 "name":"Light Middle",
                 "type":"light",
                 "state":false
             },
             {
-                "id":3,
+                "id":1.4,
                 "name":"Outer Led Strip",
                 "type":"light",
                 "state":false
             },
             {
-                "id":4,
+                "id":1.5,
                 "name":"Inner Middle Strip",
                 "type":"light",
                 "state":false
             },
             {
-                "id":5,
+                "id":2.1,
                 "name":"Fan",
                 "type":"fan",
                 "state":false
             },
             {
-                "id":6,
+                "id":1.6,
                 "name":"Switch One",
                 "type":"switch",
                 "state":false
@@ -53,55 +53,55 @@
         "name":"First Floor Lobby",
         "devices":[
             {
-                "id":0,
+                "id":3.1,
                 "name":"Light One",
                 "type":"light",
                 "state":false
             },
             {
-                "id":1,
+                "id":3.2,
                 "name":"Light Two",
                 "type":"light",
                 "state":false
             },
             {
-                "id":2,
+                "id":3.3,
                 "name":"Light Three",
                 "type":"light",
                 "state":false
             },
             {
-                "id":3,
+                "id":3.4,
                 "name":"Light Four",
                 "type":"light",
                 "state":false
             },
             {
-                "id":4,
+                "id":3.5,
                 "name":"Light five",
                 "type":"light",
                 "state":false
             },
             {
-                "id":5,
+                "id":4.1,
                 "name":"Fan One",
                 "type":"fan",
                 "state":false
             },
             {
-                "id":6,
+                "id":4.2,
                 "name":"Fan Two",
                 "type":"fan",
                 "state":false
             },
             {
-                "id":7,
+                "id":4.3,
                 "name":"Switch One",
                 "type":"switch",
                 "state":false
             },
             {
-                "id":8,
+                "id":4.4,
                 "name":"Switch Two",
                 "type":"switch",
                 "state":false

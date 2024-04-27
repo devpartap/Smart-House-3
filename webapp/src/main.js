@@ -33,12 +33,17 @@ const vuetify = createVuetify({
 const app = createApp(App)
 
 // profiling
+// NOTE
+// - in house profile, room id is in format of (floor no) . (room no) [eg 1.2 which means it's room 2 on first floor]
+// - in house profile, device id is i frmat of (worker id) . (switch no) [eg 2.2 which means it's connected to 2nd worker and to it's 2nd switch ]
 import house_profile from '../houseprofile.json'
 console.log(house_profile)
 
+
 app.provide('$hp', house_profile)
 app.provide('$g', {
-  active_room:1.1
+  active_room:1.1,
+  master_url:'http://192.168.29.167'
 })
 
 // app setup

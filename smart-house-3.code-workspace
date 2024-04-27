@@ -1,6 +1,7 @@
 {
 	"folders": [
 		{
+			"name": "master",
 			"path": "master"
 		},
 		{
@@ -8,6 +9,7 @@
 			"path": "worker"
 		},
 		{
+			"name": "webapp",
 			"path": "webapp"
 		}
 	],

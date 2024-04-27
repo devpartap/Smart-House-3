@@ -80,13 +80,8 @@
                     </td>
 
                     <td >
-                        <v-switch
-                        style="float: right;"
-                            v-model="device.state"
-                            color="primary"
-                            hide-details
-                            inset
-                        ></v-switch>
+                        <v-switch style="float: right;" color="primary" hide-details inset
+                                  v-model="device.state" @click="sendSignal(device.id)"></v-switch>
                     </td>
                 </tr>
             </tbody>
@@ -124,6 +119,11 @@ function changeActiveRoom(_room_id_)
     $global.active_room = _room_id_
 }
 
+function sendSignal(_device_id_)
+{
+    console.log(_device_id_)
+}
+
 function m_getFloorName(_floor_)
 {
     if(_floor_ == 0)
@@ -143,10 +143,18 @@ function m_getFloorName(_floor_)
         return "3rd Floor"
     }
     else
-    {
+    {z
         return _floor_ + "th Floor"
     }
 }
+
+const xhr = new XMLHttpRequest();
+xhr.open('GET',($global.master_url))
+
+xhr.onload = () => {
+    console.log(xhr.response)
+}
+xhr.send()
 
 
 
