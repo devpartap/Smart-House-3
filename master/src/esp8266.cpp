@@ -46,14 +46,40 @@ String espWaitRead()
 
 void espSendData(const String & _Data_,const char & _conectionNO_)
 {
-    _ESP8266.print("AT+CIPSEND=");
-    _ESP8266.print(_conectionNO_);
-    _ESP8266.println(",85");
-    espRead();
+    // _ESP8266.print("AT+CIPSEND=");
+    // _ESP8266.print(_conectionNO_);
+    // _ESP8266.println(",50");
+    // espRead();
+    // _ESP8266.println("Access-Control-Allow-Origin: *");
+    // _ESP8266.println("qwertyuioplkjhgfdsazxcvbnmwertyuioplkjhgfdsazxcvbnmwertyuioplkjhgfdsazxcvbnmwertyuioplkjhgfdsazxcvbnm");
 
-    _ESP8266.print("HTTP/1.1 200 OK\nContent-Length:");
-    _ESP8266.println("2");
-    _ESP8266.print(header);
-    _ESP8266.println(_Data_);
+    // // _ESP8266.print("HTTP/1.1 200 \nContent-Length:");
+    // // _ESP8266.println("2");
+    // // _ESP8266.print(header);
+    // // _ESP8266.println(_Data_);
+
+
+
+
+
+  String Command = "AT+CIPSEND=" + (String)_conectionNO_ + ",121";
+
+  _ESP8266.println(Command);
+  delay(10);
+  
+  _ESP8266.println("HTTP/1.1 200 OK");
+
+  _ESP8266.println("Content-Length: 6");
+
+
+  
+  _ESP8266.println("Content-Type: text/plain");
+  _ESP8266.println("Access-Control-Allow-Origin: *");
+  _ESP8266.println("Connection: close");
+  _ESP8266.println("");
+  _ESP8266.println("101010");
+
+  espWaitRead();
+
 
 }

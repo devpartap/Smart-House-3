@@ -39,26 +39,27 @@ struct RequestData
     bool to_process;
     String body;
 
-    void decode(const String & _request_)
-    {
-
-        connection_No = _request_[0];
-            
-        if(_request_[_request_.indexOf(':',9) + 1] == 'G')
-        {
-            type = STATUS;
-            body = "";
-            to_process = true;
-        }
-        else
-        {
-            to_process = false;
-        }
-    }
-
 
 };
-RequestData Request;
+
+RequestData Request[5];
+
+bool decodeRequest(const String & _newrequest_)
+{    
+    short connection_No = _newrequest_[0];
+            
+    if(_newrequest_[_newrequest_.indexOf(':') + 1] == 'G')
+    {
+        type = STATUS;
+        body = "";
+        to_process = true;
+    }
+    else
+    {
+        to_process = false;
+    }
+}
+
 
 void loop()
 {
@@ -75,7 +76,7 @@ void loop()
 
         if(Request.type == requestType::STATUS)
         {
-            espSendData("101010",Request.connection_No);
+            espSendData("1010110100",Request.connection_No);
         }
         
 

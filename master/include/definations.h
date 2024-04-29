@@ -6,7 +6,7 @@
 #ifdef debug
     #define _Console(x) Serial.x
     #define _LogESP(x) Serial.println("\n----- ESP -----" + String(x.length()) +"\n" + x + "---------------\n");
-#elif
+#else
     #define _Console(x) 
     #define _LogESP(x) 
 #endif

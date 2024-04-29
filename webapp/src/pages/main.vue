@@ -148,13 +148,25 @@ function m_getFloorName(_floor_)
     }
 }
 
+
+
+
 const xhr = new XMLHttpRequest();
-xhr.open('GET',($global.master_url))
+function sendxhr()
+{
+    xhr.open('GET',($global.master_url))
+    xhr.send()
+}
 
 xhr.onload = () => {
     console.log(xhr.response)
+    setTimeout(sendxhr, 800)
 }
-xhr.send()
+
+
+sendxhr()
+
+
 
 
 
