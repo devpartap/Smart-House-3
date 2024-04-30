@@ -36,53 +36,90 @@ struct RequestData
 {
     requestType type;
     char connection_No;
-    bool to_process;
+    bool to_process = false;
+    long recivedOnMillis;
     String body;
-
 
 };
 
 RequestData Request[5];
 
-bool decodeRequest(const String & _newrequest_)
+
+
+void decodeRequest(const String & _newrequest_,unsigned int startIndex)
 {    
-    short connection_No = _newrequest_[0];
+    _Console(println("Decode:Inhere"));
+    const short connection_No = _newrequest_[startIndex-2] - '0';
             
-    if(_newrequest_[_newrequest_.indexOf(':') + 1] == 'G')
+    if(_newrequest_[_newrequest_.indexOf(':',startIndex) + 1] == 'G')
     {
-        type = STATUS;
-        body = "";
-        to_process = true;
+        Request[connection_No].connection_No = _newrequest_[startIndex-2];
+        Request[connection_No].type = STATUS;
+        Request[connection_No].to_process = true;
+        if(connection_No == 0)
+        {
+            Request[connection_No].recivedOnMillis = millis();
+        }
+        else
+        {
+            Request[connection_No].recivedOnMillis = Request[connection_No - 1].recivedOnMillis + 1000;
+            _Console(println(Request[connection_No - 1].recivedOnMillis));
+            _Console(println(millis()));
+        }
+        Request[connection_No].body = "";
+        _Console(println(Request[connection_No].recivedOnMillis));
+
     }
     else
     {
-        to_process = false;
+        Request[connection_No].to_process = false;
     }
+
+    if((_newrequest_.length()-startIndex)>400)
+    {
+        _Console(println("Decode:more_detected"));
+        int nxtIndex = _newrequest_.indexOf("CONNECT",200);
+        if(nxtIndex != -1)
+        {
+            _Console(println("Decode:recalling"));
+            decodeRequest(_newrequest_,nxtIndex);
+        }
+    }
+
 }
 
 
 void loop()
 {
     String data = espRead();
+    // String data = "0,CONNECT\n\n+IPD,0,316:GET / HTTP/1.1\nHost: 192.168.29.167\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0\nAccept: */*\nAccept-Language: en-US,en;q=0.5\nAccept-Encoding: gzip, deflate\nOrigin: http://192.168.29.7:5173\nDNT: 1\nSec-GPC: 1\nConnection: keep-alive\nReferer: http://192.168.29.7:5173/\n\n2,CONNECT\n\n+IPD,2,316:GET / HTTP/1.1\nHost: 192.168.29.167\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0\nAccept: */*\nAccept-Language: en-US,en;q=0.5\nAccept-Encoding: gzip, deflate\nOrigin: http://192.168.29.7:5173\nDNT: 1\nSec-GPC: 1\nConnection: keep-alive\nReferer: http://192.168.29.7:5173/\n";
+   
     if(data.length() > 100)
     {
-        if(data.substring(2,9) == "CONNECT")
-            Request.decode(data);
+        int stIndex = data.indexOf("CONNECT");
+        if(stIndex != -1)
+            decodeRequest(data,stIndex);
     }
 
-    if(Request.to_process)
+    // delay(50000);
+    for(short i = 0; i<=4;i++)
     {
-        _Console(println("processing!!"));
+        if((Request[i].to_process) && (int(millis() - Request[i].recivedOnMillis) >= 5000))
+        {   
+            _Console(println("processing!!"));
+            _Console(println(Request[i].connection_No));
 
-        if(Request.type == requestType::STATUS)
-        {
-            espSendData("1010110100",Request.connection_No);
-        }
+            if(Request[i].type == requestType::STATUS)
+            {
+                espSendData("1010110100",Request[i].connection_No);
+                _ESP8266.flush();
+            }
         
 
-        Request.to_process = false;
+            Request[i].to_process = false;
+        }
     }
     
-  delay(100);
+  delay(50);
 }
 

@@ -160,13 +160,18 @@ function sendxhr()
 
 xhr.onload = () => {
     console.log(xhr.response)
-    setTimeout(sendxhr, 800)
+    setTimeout(sendxhr, 100)
+}
+
+xhr.timeout = 10000
+
+xhr.ontimeout = () => {
+    console.log("request Timed Out!")
+    setTimeout(sendxhr, 100)
 }
 
 
 sendxhr()
-
-
 
 
 
