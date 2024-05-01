@@ -152,26 +152,28 @@ function m_getFloorName(_floor_)
 
 
 const xhr = new XMLHttpRequest();
-function sendxhr()
-{
-    xhr.open('GET',($global.master_url))
-    xhr.send()
-}
+// function sendxhr()
+// {
+//     xhr.open('GET',($global.master_url) + "/a")
+//     xhr.send()
+// }
 
 xhr.onload = () => {
     console.log(xhr.response)
-    setTimeout(sendxhr, 100)
+    // setTimeout(sendxhr, 100)
 }
 
-xhr.timeout = 10000
+// xhr.timeout = 10000
 
-xhr.ontimeout = () => {
-    console.log("request Timed Out!")
-    setTimeout(sendxhr, 100)
-}
+// xhr.ontimeout = () => {
+//     console.log("request Timed Out!")
+//     setTimeout(sendxhr, 100)
+// }
 
+// sendxhr()
 
-sendxhr()
+xhr.open('GET',($global.master_url) + "/a")
+    xhr.send()
 
 
 

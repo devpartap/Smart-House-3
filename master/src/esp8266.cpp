@@ -48,7 +48,7 @@ String espWaitRead()
 void espSendData(const String & _Data_,const char & _conectionNO_)
 {
 
-  _ESP8266.println("AT+CIPSEND=" + (String)_conectionNO_ + ",121");
+  _ESP8266.println("AT+CIPSEND=" + (String)_conectionNO_ + ",126");
   delay(10);
   
   _ESP8266.println("HTTP/1.1 200 OK");
@@ -57,8 +57,10 @@ void espSendData(const String & _Data_,const char & _conectionNO_)
 
   _ESP8266.println("Content-Type: text/plain");
   _ESP8266.println("Access-Control-Allow-Origin: *");
-  _ESP8266.println("Connection: close");
+  _ESP8266.println("Connection: keep-alive");
   _ESP8266.println("");
-  _ESP8266.println("101010");
+  _ESP8266.println(_Data_);
+
+  _ESP8266.flush();
 
 }
