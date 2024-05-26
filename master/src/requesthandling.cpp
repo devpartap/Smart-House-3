@@ -1,74 +1,116 @@
 #include "definations.h"
 #include "esp8266.h"
+#include "cryptography.h"
 
-enum RequestType {
-    ROOM_STATUS = 'a',
-    UPDATE_DEVICE = 'u'
-};
+#include "database.h"
 
-static char connection_No;
-static char request_type;
-static unsigned int request_startingpt;
-static unsigned int request_length;
+#define WEBSOCKET_HANDSHAKE 'G'
+#define WEBSOCKET_MESSAGE (char)129
+#define WEBSOCKET_CLOSING_HANDSHAKE (char)136
+#define FLOOR_STATUS_REQUEST 'F'
+#define UPDATE_DEVICE 'U'
 
-void processRequest(const String & _newrequest_,unsigned int startIndex)
+bool WebSocketsConnections[] = {false,false,false,false};
+
+void DecodeWebsocet(char* _recv_msg,char* _buffer, const uint8_t _buffer_size);
+
+void processRequest(cStrWithSize _newrequest_,const uint16_t & stIndex = 0)
 {    
-    _Console(println("Decode:Inhere"));
+    _CslLogln("PROCESSING REQUEST!");
 
-    connection_No = _newrequest_[startIndex+5];
-    request_startingpt = _newrequest_.indexOf('/',startIndex+12);
-    request_length = _newrequest_.substring(startIndex+7,request_startingpt-5).toInt();
-    request_type = _newrequest_[request_startingpt+1];
+    int16_t startIndex = cStr_indexOf(_newrequest_,"+IPD",stIndex);
+    _CslLogln(startIndex);
 
-    _Console(println(connection_No));
-    _Console(println(request_startingpt));
-    _Console(println(request_length));
-    _Console(println(request_type));
-
-    espSendRead("AT+CIPSTATUS");
-
-    if(request_type == ROOM_STATUS)
+    if(startIndex != -1)
     {
-        espSendData("101010",connection_No);
-    }
+        unsigned char connection_No = _newrequest_[startIndex+5];
+        uint16_t request_startingpt = cStr_indexOf(_newrequest_,":",startIndex+8);
+        uint16_t request_length = 0;
 
-    if(_newrequest_.length() - (request_length+startIndex) >= 100)
-    {
-        int new_stIndex = _newrequest_.indexOf("+IPD",request_length+startIndex);
-        if(new_stIndex != -1)
-            processRequest(_newrequest_,new_stIndex);
-    }
+        for(uint16_t i = startIndex+7; i < request_startingpt; i++)
+        {
+            request_length *= 10;
+            request_length += _newrequest_[i] - '0';
+        }
+
+        char request_type = _newrequest_[request_startingpt+1];
+
+        _CslLogln(connection_No);
+        _CslLogln(request_startingpt);
+        _CslLogln(request_length);
+        _CslLog(request_type);
+        _CslLog(" : ");
+        _CslLogln((uint8_t)_newrequest_.strptr[request_startingpt+1]);
+
+        if(request_type == WEBSOCKET_MESSAGE)
+        {
             
+            char msg[request_length - 6];
+            DecodeWebsocet(_newrequest_.strptr + request_startingpt + 1,msg,request_length - 6);
+
+            if(msg[0] == FLOOR_STATUS_REQUEST)
+            {
+                if(msg[1] == '0')
+                {
+                    sendDataOnWebsocket(connection_No,"01");
+                }
+                else if(msg[1] == '1')
+                {
+                    sendDataOnWebsocket(connection_No,"0000011100000001");
+                }
+            }
+
+            else if(msg[0] == UPDATE_DEVICE)
+            {
+                sendDataOnWebsocket(connection_No, "OK");
+            }
+        }
+
+        else if(request_type == WEBSOCKET_HANDSHAKE)
+        {
+            uint16_t index = cStr_indexOf(_newrequest_,"ket-Key",300);
+            cStrWithSize key(_newrequest_.strptr +index + 9,24);
+
+#ifdef debug
+            cStr_print(key);
+#endif
+            espConnectWebsocket(connection_No,processWebsocketKey(key));
+            WebSocketsConnections[connection_No - '0'] = true; 
+            
+        }
+        else if(request_type == WEBSOCKET_CLOSING_HANDSHAKE)
+        {
+            WebSocketsConnections[connection_No - '0'] = false;
+            _CslLog("Closed : ");
+            _CslLogln(connection_No - '0');
+        }
+
+        if(_newrequest_.length - (request_length+startIndex) >= 14)
+        {
+            processRequest(_newrequest_,request_length+startIndex);
+        }
+
+    }          
 }
 
-
-static String TCPStatus;
-static int starting_pt = 5;
-void sendActiveCall()
+void DecodeWebsocet(char* _recv_msg,char* _buffer, const uint8_t _buffer_size)
 {
-    espSendRead("AT+CIPSTATUS");
-    TCPStatus = espWaitRead();
 
-    if(TCPStatus.length() > 270)
+    for(uint8_t i = 0;i < _buffer_size; i++)
     {
-        int starting_pt = TCPStatus.indexOf("+IPD");
-        if(starting_pt != -1)
-            processRequest(TCPStatus,starting_pt);
+        _buffer[i] = (_recv_msg[i+6] ^ _recv_msg[2 + (i % 4)]);
     }
-    else
+
+#ifdef debug
+    _CslLog("Discrypted char :- ");
+    for(int i = 0;i<_buffer_size;i++)
     {
-        if(TCPStatus.indexOf("+",starting_pt) != -1)
-        do{
-            starting_pt = TCPStatus.indexOf("+",starting_pt);
-        } while (starting_pt != -1);    
-        
-        
+        _CslLog(_buffer[i]);
+        _CslLog('|');
     }
-    
+    _CslLog('\n');
+#endif
+        
 }
 
-// void getTCPConnections(String & TCP_data,unsigned int * startingIndex,bool & buffer)
-// {
-
-// }
 

@@ -13,5 +13,12 @@
 			"path": "webapp"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp",
+			"random": "cpp",
+			"bitset": "cpp",
+			"string_view": "cpp"
+		}
+	}
 }

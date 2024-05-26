@@ -1,4 +1,22 @@
 {
+    "0.1":{
+        "room_id":0.1,  
+        "name":"Main Room",
+        "devices":[
+            {
+                "id":1.1,
+                "name":"Light A",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":1.2,
+                "name":"Light Light B",
+                "type":"light",
+                "state":false
+            }
+        ]
+    },
     "1.1":{
         "room_id":1.1,  
         "name":"Main Room",
@@ -13,7 +31,7 @@
                 "id":1.2,
                 "name":"Light Left & Strip",
                 "type":"light",
-                "state":false
+                "state":true
             },
             {
                 "id":1.3,

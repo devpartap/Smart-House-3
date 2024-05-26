@@ -73,16 +73,16 @@
         <v-table density="comfortable">
 
 
-            <tbody>
-                <tr v-for="device in $hp[$global.active_room].devices" :key="device.id" >
+            <tbody v-show="readyToUse">
+                <tr v-for="device in $hp[$global.active_room].devices" :key="device.id"  >
                     <td class="text-h6 font-weight-bold" style="color: #424242; ">
                         {{ device.name }}
                     </td>
 
                     <td >
-                        <v-switch style="float: right;" color="primary" hide-details inset
-                                  v-model="device.state" @click="sendSignal(device.id)"></v-switch>
-                    </td>
+                        <v-switch style="float: right;" :color="(device.state) ? 'success' : '' " hide-details inset :loading="switchloading == device.id" 
+                        v-model="device.state" @change="sendDeviceState($global.active_room,device.id,device.state)"></v-switch>
+                    </td>                
                 </tr>
             </tbody>
         </v-table>
@@ -103,6 +103,9 @@ const $hp = ref(inject('$hp'))
 const $global = reactive(inject('$g'))
 
 const drawer = ref(false)
+const switchloading = ref(0.0)
+
+const readyToUse = ref(false);
 
 let listColors = {
     "light":"green",
@@ -111,8 +114,12 @@ let listColors = {
     "switch":"gery"
 }
 
+let activecolor = ref([
+    " ",
+    "success"
+])
 
-//   --- Getting Current Roomdata
+//   --- Getting Current Roomdata ---
 
 function changeActiveRoom(_room_id_)
 {
@@ -143,38 +150,87 @@ function m_getFloorName(_floor_)
         return "3rd Floor"
     }
     else
-    {z
+    {
         return _floor_ + "th Floor"
     }
 }
 
 
 
+const socket = new WebSocket('ws://192.168.29.167/a-')
 
-const xhr = new XMLHttpRequest();
-// function sendxhr()
-// {
-//     xhr.open('GET',($global.master_url) + "/a")
-//     xhr.send()
-// }
+//TESTING SERVER
+// const socket = new WebSocket('ws://192.168.29.7:8080')
 
-xhr.onload = () => {
-    console.log(xhr.response)
-    // setTimeout(sendxhr, 100)
+
+socket.onmessage = ({data}) => {
+    console.log("Recieved : - ", data);
+
 }
 
-// xhr.timeout = 10000
-
-// xhr.ontimeout = () => {
-//     console.log("request Timed Out!")
-//     setTimeout(sendxhr, 100)
-// }
-
-// sendxhr()
-
-xhr.open('GET',($global.master_url) + "/a")
-    xhr.send()
+socket.onopen = () => {
+    console.log("Handshake complete!")   
+    askFloorStatus()
+}
 
 
+function sendDataOnWS(_DATA)
+{
+    return new Promise(function(resolve,reject) {
+        socket.send(_DATA);
+        socket.onmessage = (receved_Data) => {
+            if(receved_Data[0] == '~')
+            {
+                reject(receved_Data)
+            }
+            else
+            {
+                resolve(receved_Data)
+            }
+        }
+    });
+   
+}
+
+async function sendDeviceState(_RoomID,_DeviceID,_state)
+{
+    try{
+        switchloading.value = _DeviceID
+        let responce = await sendDataOnWS(`U ${_RoomID} ${_DeviceID} ${_state}`)
+        switchloading.value = 0
+
+        // activecolor = "success"
+
+    } 
+    catch (error) {
+        console.log("ERROR FROM SERVER :- " + error);
+        
+    }
+}
+
+async function askFloorStatus()
+{
+    try{
+        let responce = await sendDataOnWS(`F${Math.trunc($global.active_room)}`)
+        let i = 0;
+
+        $hp.value.layout[Math.trunc($global.active_room)].forEach((ele) => {
+            $hp.value[ele].devices.forEach((div) => {
+                div.state = (responce.data[i] === '1')
+                i++;
+            })
+        })
+        console.log(responce.data)
+        console.log($hp.value['1.1'].devices)
+
+        readyToUse.value = true;
+
+    } 
+    catch (error) {
+        console.log("ERROR FROM SERVER :- " + error);
+    }
+}
+
+ 
 
 </script>
