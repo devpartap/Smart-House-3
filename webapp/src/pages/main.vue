@@ -73,7 +73,8 @@
         <v-table density="comfortable">
 
 
-            <tbody v-show="readyToUse">
+            <!-- <tbody v-show="readyToUse"> -->
+            <tbody>
                 <tr v-for="device in $hp[$global.active_room].devices" :key="device.id"  >
                     <td class="text-h6 font-weight-bold" style="color: #424242; ">
                         {{ device.name }}
@@ -196,7 +197,7 @@ async function sendDeviceState(_RoomID,_DeviceID,_state)
 {
     try{
         switchloading.value = _DeviceID
-        let responce = await sendDataOnWS(`U ${_RoomID} ${_DeviceID} ${_state}`)
+        let responce = await sendDataOnWS(`U ${_RoomID}.${_DeviceID}.${Number(_state)}`)
         switchloading.value = 0
 
         // activecolor = "success"

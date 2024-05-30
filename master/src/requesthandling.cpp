@@ -2,7 +2,6 @@
 #include "esp8266.h"
 #include "cryptography.h"
 
-#include "database.h"
 
 #define WEBSOCKET_HANDSHAKE 'G'
 #define WEBSOCKET_MESSAGE (char)129
@@ -62,7 +61,27 @@ void processRequest(cStrWithSize _newrequest_,const uint16_t & stIndex = 0)
 
             else if(msg[0] == UPDATE_DEVICE)
             {
+                uint8_t deviceAdress[4] = {0,0,0,0};
+
+                uint8_t infotype = 0;
+                uint8_t i = 2;
+                for(; i < request_length - 7; i++)
+                {
+                    if(msg[i] == '.')
+                    {
+                        infotype++;
+                    }
+                    else
+                    {
+                        deviceAdress[infotype] *= 10;
+                        deviceAdress[infotype] += msg[i] - '0';
+                    }
+                }
+
+                bool deviceNewState = msg[i] - '0';
+
                 sendDataOnWebsocket(connection_No, "OK");
+                      
             }
         }
 

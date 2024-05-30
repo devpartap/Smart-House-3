@@ -18,7 +18,8 @@
 			"*.tcc": "cpp",
 			"random": "cpp",
 			"bitset": "cpp",
-			"string_view": "cpp"
+			"string_view": "cpp",
+			"cstdint": "cpp"
 		}
 	}
 }

@@ -17,10 +17,12 @@ void setup()
     _ESP8266.setTimeout(15);
 
     // error checking
+#ifndef debug
     if(cStr_indexOf(espSendRead("AT"),"OK") == -1)
     {
         errLED();
     }
+#endif
 
     // setting up ESP
     digitalWrite(test_led,HIGH);
