@@ -1,5 +1,4 @@
 #pragma once
 #include "definations.h"
 
-
-void processRequest(cStrWithSize _newrequest_,const uint16_t & stIndex = 0);
+void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 0);

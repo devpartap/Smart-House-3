@@ -2,134 +2,127 @@
 #include "esp8266.h"
 #include "cryptography.h"
 
-
-#define WEBSOCKET_HANDSHAKE 'G'
 #define WEBSOCKET_MESSAGE (char)129
 #define WEBSOCKET_CLOSING_HANDSHAKE (char)136
+#define WEBSOCKET_HANDSHAKE 'G'
 #define FLOOR_STATUS_REQUEST 'F'
 #define UPDATE_DEVICE 'U'
 
-bool WebSocketsConnections[] = {false,false,false,false};
+bool websockets_connections[] = {false, false, false, false};
 
-void DecodeWebsocet(char* _recv_msg,char* _buffer, const uint8_t _buffer_size);
 
-void processRequest(cStrWithSize _newrequest_,const uint16_t & stIndex = 0)
-{    
-    _CslLogln("PROCESSING REQUEST!");
-
-    int16_t startIndex = cStr_indexOf(_newrequest_,"+IPD",stIndex);
-    _CslLogln(startIndex);
-
-    if(startIndex != -1)
-    {
-        unsigned char connection_No = _newrequest_[startIndex+5];
-        uint16_t request_startingpt = cStr_indexOf(_newrequest_,":",startIndex+8);
-        uint16_t request_length = 0;
-
-        for(uint16_t i = startIndex+7; i < request_startingpt; i++)
-        {
-            request_length *= 10;
-            request_length += _newrequest_[i] - '0';
-        }
-
-        char request_type = _newrequest_[request_startingpt+1];
-
-        _CslLogln(connection_No);
-        _CslLogln(request_startingpt);
-        _CslLogln(request_length);
-        _CslLog(request_type);
-        _CslLog(" : ");
-        _CslLogln((uint8_t)_newrequest_.strptr[request_startingpt+1]);
-
-        if(request_type == WEBSOCKET_MESSAGE)
-        {
-            
-            char msg[request_length - 6];
-            DecodeWebsocet(_newrequest_.strptr + request_startingpt + 1,msg,request_length - 6);
-
-            if(msg[0] == FLOOR_STATUS_REQUEST)
-            {
-                if(msg[1] == '0')
-                {
-                    sendDataOnWebsocket(connection_No,"01");
-                }
-                else if(msg[1] == '1')
-                {
-                    sendDataOnWebsocket(connection_No,"0000011100000001");
-                }
-            }
-
-            else if(msg[0] == UPDATE_DEVICE)
-            {
-                uint8_t deviceAdress[4] = {0,0,0,0};
-
-                uint8_t infotype = 0;
-                uint8_t i = 2;
-                for(; i < request_length - 7; i++)
-                {
-                    if(msg[i] == '.')
-                    {
-                        infotype++;
-                    }
-                    else
-                    {
-                        deviceAdress[infotype] *= 10;
-                        deviceAdress[infotype] += msg[i] - '0';
-                    }
-                }
-
-                bool deviceNewState = msg[i] - '0';
-
-                sendDataOnWebsocket(connection_No, "OK");
-                      
-            }
-        }
-
-        else if(request_type == WEBSOCKET_HANDSHAKE)
-        {
-            uint16_t index = cStr_indexOf(_newrequest_,"ket-Key",300);
-            cStrWithSize key(_newrequest_.strptr +index + 9,24);
-
-#ifdef debug
-            cStr_print(key);
-#endif
-            espConnectWebsocket(connection_No,processWebsocketKey(key));
-            WebSocketsConnections[connection_No - '0'] = true; 
-            
-        }
-        else if(request_type == WEBSOCKET_CLOSING_HANDSHAKE)
-        {
-            WebSocketsConnections[connection_No - '0'] = false;
-            _CslLog("Closed : ");
-            _CslLogln(connection_No - '0');
-        }
-
-        if(_newrequest_.length - (request_length+startIndex) >= 14)
-        {
-            processRequest(_newrequest_,request_length+startIndex);
-        }
-
-    }          
-}
-
-void DecodeWebsocet(char* _recv_msg,char* _buffer, const uint8_t _buffer_size)
+void decodeWebsocet(char *_recv_msg, char *_buffer, const uint8_t _buffer_size)
 {
 
-    for(uint8_t i = 0;i < _buffer_size; i++)
+    for (uint8_t i = 0; i < _buffer_size; i++)
     {
-        _buffer[i] = (_recv_msg[i+6] ^ _recv_msg[2 + (i % 4)]);
+        _buffer[i] = (_recv_msg[i + 6] ^ _recv_msg[2 + (i % 4)]);
     }
 
 #ifdef debug
     _CslLog("Discrypted char :- ");
-    for(int i = 0;i<_buffer_size;i++)
+    for (int i = 0; i < _buffer_size; i++)
     {
         _CslLog(_buffer[i]);
         _CslLog('|');
     }
     _CslLog('\n');
 #endif
-        
 }
 
 
+void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 0)
+{
+    _CslLogln("PROCESSING REQUEST!");
+
+    int16_t start_index = CStrWithSize::indexOf(_newrequest, "+IPD", _stIndex);
+    _CslLogln(start_index);
+
+    if (start_index != -1)
+    {
+        unsigned char connection_no = _newrequest[start_index + 5];
+        uint16_t request_starting_pt = CStrWithSize::indexOf(_newrequest, ":", start_index + 8);
+        uint16_t request_length = 0;
+
+        for (uint16_t i = start_index + 7; i < request_starting_pt; i++)
+        {
+            request_length *= 10;
+            request_length += _newrequest[i] - '0';
+        }
+
+        char request_type = _newrequest[request_starting_pt + 1];
+
+        _CslLogln(connection_no);
+        _CslLogln(request_starting_pt);
+        _CslLogln(request_length);
+        _CslLog(request_type);
+        _CslLog(" : ");
+        _CslLogln((uint8_t)_newrequest.strptr[request_starting_pt + 1]);
+
+        if (request_type == WEBSOCKET_MESSAGE)
+        {
+
+            char msg[request_length - 6];
+            decodeWebsocet(_newrequest.strptr + request_starting_pt + 1, msg, request_length - 6);
+
+            if (msg[0] == FLOOR_STATUS_REQUEST)
+            {
+                if (msg[1] == '0')
+                {
+                    sendDataOnWebSocket(connection_no, "01");
+                }
+                else if (msg[1] == '1')
+                {
+                    sendDataOnWebSocket(connection_no, "0000011100000001");
+                }
+            }
+
+            else if (msg[0] == UPDATE_DEVICE)
+            {
+                uint8_t device_adress[4] = {0, 0, 0, 0};
+
+                uint8_t info_type = 0;
+                uint8_t i = 2;
+                for (; i < request_length - 7; i++)
+                {
+                    if (msg[i] == '.')
+                    {
+                        info_type++;
+                    }
+                    else
+                    {
+                        device_adress[info_type] *= 10;
+                        device_adress[info_type] += msg[i] - '0';
+                    }
+                }
+
+                bool device_new_state = msg[i] - '0';
+
+                sendDataOnWebSocket(connection_no, "OK");
+            }
+        }
+
+        else if (request_type == WEBSOCKET_HANDSHAKE)
+        {
+            uint16_t index = CStrWithSize::indexOf(_newrequest, "ket-Key", 300);
+            CStrWithSize key(_newrequest.strptr + index + 9, 24);
+
+#ifdef debug
+            CStrWithSize::print(key);
+#endif
+            espConnectWebSocket(connection_no, processWebsocketKey(key));
+            websockets_connections[connection_no - '0'] = true;
+        }
+        else if (request_type == WEBSOCKET_CLOSING_HANDSHAKE)
+        {
+            websockets_connections[connection_no - '0'] = false;
+            _CslLog("Closed : ");
+            _CslLogln(connection_no - '0');
+        }
+
+        if (_newrequest.length - (request_length + start_index) >= 14)
+        {
+            processRequest(_newrequest, request_length + start_index);
+        }
+    }
+}

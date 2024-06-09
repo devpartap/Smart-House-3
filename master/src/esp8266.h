@@ -2,13 +2,13 @@
 
 #include "definations.h"
 
-cStrWithSize espRead();
-cStrWithSize espSendRead(const char* command);
-// cStrWithSize espWaitRead();
+CStrWithSize espRead();
+CStrWithSize espSendRead(const char *_command);
+// CStrWithSize espWaitRead();
 
 int espAvailable();
 
-void espConnectWebsocket(const char & _conectionNO_,cStrWithSize _respondkey_);
-void sendDataOnWebsocket( const char & _ConnectionNO,const char * _Data);
+void espConnectWebSocket(const char &_conection_no, const CStrWithSize &_respondkey);
+void sendDataOnWebSocket(const char &_connection_no, const char *_data);
 
 // void sendWebsocketPing(const char & _ConnectionNO);

@@ -2,4 +2,4 @@
 
 #include "definations.h"
 
-cStrWithSize processWebsocketKey(cStrWithSize & inkey);
+CStrWithSize processWebsocketKey(const CStrWithSize &inkey);
