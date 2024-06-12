@@ -1,26 +1,25 @@
 #pragma once
 #include <Arduino.h>
 
-#define debug
+#define _DEBUG_
+// -- _debuggingging Stuff ---
+#ifdef _DEBUG_
 
-// -- Debugging Stuf ---
-#ifdef debug
-
-#define _CslLog(x) Serial.print(x)
-#define _CslLogln(x) Serial.println(x)
-#define _Csl(x) Serial.x
-#define _LogESP(x, y)              \
-    _CslLog("\n----- ESP ----- "); \
-    _CslLog(y);                    \
-    _CslLog('\n');                 \
-    _CslLog(x);                    \
-    _CslLog("\n---------------\n")
+#define CLOG(x) Serial.print(x)
+#define CLOG_LN(x) Serial.println(x)
+#define CONSOLE(x) Serial.x
+#define LOG_ESP(x, y)              \
+    CLOG("\n----- ESP ----- "); \
+    CLOG(y);                    \
+    CLOG('\n');                 \
+    CLOG(x);                    \
+    CLOG("\n---------------\n")
 
 #else
-#define _CslLog(x)
-#define _CslLogln(x)
-#define _Csl(x)
-#define _LogESP(x, y)
+#define CLOG(x)
+#define CLOG_LN(x)
+#define CONSOLE(x)
+#define LOG_ESP(x, y)
 #endif
 
 #define _ESP8266 Serial3
@@ -37,9 +36,7 @@ struct CStrWithSize
             strptr[length] = '\0';
     }
 
-    CStrWithSize()
-    {
-    }
+    CStrWithSize() = default;
 
     char operator[](const uint16_t &indx) const
     {
@@ -48,7 +45,7 @@ struct CStrWithSize
 
     static int16_t indexOf(const CStrWithSize &_bsting, const char *_tofindindex, const uint16_t &_stIndex = 0);
 
-#ifdef debug
+#ifdef _DEBUG_
     static void print(CStrWithSize &_bstring);
 #endif
 };

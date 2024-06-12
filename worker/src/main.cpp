@@ -1,15 +1,31 @@
-#include <Arduino.h>
+#define _DEBUG_
 
-#define def_LED 0
+#include "definations.h"
+#include "communication.h"
 
-void setup() {
-  pinMode(def_LED,OUTPUT);
+void setup()
+{
+
+    CONSOLE(begin(115200));
+    CONSOLE(setDebugOutput(true));
+
+    connectToWiFi();
+    delay(50);
+
+    connectToMaster();
+
+    CLOG("Setup Complete!");
 }
 
-void loop() {
-  digitalWrite(def_LED,HIGH);
-  delay(1000);
-  digitalWrite(def_LED,LOW);
-  delay(1000);
-}
+void loop()
+{
 
+    // WiFiClient client = server.accept();
+
+    // if (client.connected())
+    // {
+    //     CLOG_LN("Connected to client");
+    // }
+
+    // client.stop();
+}

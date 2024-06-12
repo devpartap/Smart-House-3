@@ -11,11 +11,21 @@ CStrWithSize espSendRead(const char *_command)
     return espRead();
 }
 
+CStrWithSize espWaitRead(const char * _command)
+{
+    _ESP8266.println(_command);
+    _ESP8266.flush();
+    delay(10);
+
+    while(!_ESP8266.available()) { }
+        return espRead();
+}
+
 CStrWithSize espRead()
 {
-#ifdef debug
+#ifdef _DEBUG_
     CStrWithSize temp(rx_buffer, _ESP8266.readBytes(rx_buffer, 512), true);
-    _LogESP(temp.strptr, temp.length);
+    LOG_ESP(temp.strptr, temp.length);
     return temp;
 
 #else
@@ -67,6 +77,11 @@ void sendDataOnWebSocket(const char &_connection_no, const char *_data)
     _ESP8266.println(_data);
 
     _ESP8266.flush();
+}
+
+void connectToIt()
+{
+    
 }
 
 // ----- WORKS, MAYBE BE USED IN FUTURE ------

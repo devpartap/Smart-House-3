@@ -4,6 +4,7 @@
 
 CStrWithSize espRead();
 CStrWithSize espSendRead(const char *_command);
+CStrWithSize espWaitRead(const char * _command);
 // CStrWithSize espWaitRead();
 
 int espAvailable();

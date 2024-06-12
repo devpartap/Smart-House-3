@@ -42,8 +42,7 @@ console.log(house_profile)
 
 app.provide('$hp', house_profile)
 app.provide('$g', {
-  active_room:1.1,
-  master_url:'http://192.168.29.167'
+  active_room:1.1
 })
 
 // app setup

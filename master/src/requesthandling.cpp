@@ -8,7 +8,9 @@
 #define FLOOR_STATUS_REQUEST 'F'
 #define UPDATE_DEVICE 'U'
 
-bool websockets_connections[] = {false, false, false, false};
+#define WORKER_STATUS 'W'
+
+ bool websockets_connections[] = {false, false, false, false};
 
 
 void decodeWebsocet(char *_recv_msg, char *_buffer, const uint8_t _buffer_size)
@@ -19,24 +21,24 @@ void decodeWebsocet(char *_recv_msg, char *_buffer, const uint8_t _buffer_size)
         _buffer[i] = (_recv_msg[i + 6] ^ _recv_msg[2 + (i % 4)]);
     }
 
-#ifdef debug
-    _CslLog("Discrypted char :- ");
+#ifdef _DEBUG_
+    CLOG("Discrypted char :- ");
     for (int i = 0; i < _buffer_size; i++)
     {
-        _CslLog(_buffer[i]);
-        _CslLog('|');
+        CLOG(_buffer[i]);
+        CLOG('|');
     }
-    _CslLog('\n');
+    CLOG('\n');
 #endif
 }
 
 
 void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 0)
 {
-    _CslLogln("PROCESSING REQUEST!");
+    CLOG_LN("PROCESSING REQUEST!");
 
     int16_t start_index = CStrWithSize::indexOf(_newrequest, "+IPD", _stIndex);
-    _CslLogln(start_index);
+    CLOG_LN(start_index);
 
     if (start_index != -1)
     {
@@ -52,12 +54,12 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
 
         char request_type = _newrequest[request_starting_pt + 1];
 
-        _CslLogln(connection_no);
-        _CslLogln(request_starting_pt);
-        _CslLogln(request_length);
-        _CslLog(request_type);
-        _CslLog(" : ");
-        _CslLogln((uint8_t)_newrequest.strptr[request_starting_pt + 1]);
+        CLOG_LN(connection_no);
+        CLOG_LN(request_starting_pt);
+        CLOG_LN(request_length);
+        CLOG(request_type);
+        CLOG(" : ");
+        CLOG_LN((uint8_t)_newrequest.strptr[request_starting_pt + 1]);
 
         if (request_type == WEBSOCKET_MESSAGE)
         {
@@ -107,7 +109,7 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
             uint16_t index = CStrWithSize::indexOf(_newrequest, "ket-Key", 300);
             CStrWithSize key(_newrequest.strptr + index + 9, 24);
 
-#ifdef debug
+#ifdef _DEBUG_
             CStrWithSize::print(key);
 #endif
             espConnectWebSocket(connection_no, processWebsocketKey(key));
@@ -116,8 +118,21 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
         else if (request_type == WEBSOCKET_CLOSING_HANDSHAKE)
         {
             websockets_connections[connection_no - '0'] = false;
-            _CslLog("Closed : ");
-            _CslLogln(connection_no - '0');
+            CLOG("Closed : ");
+            CLOG_LN(connection_no - '0');
+        }
+
+        else if (request_type == WORKER_STATUS)
+        {
+            char a = _newrequest.strptr[request_starting_pt + 1];
+            uint8_t b = _newrequest.strptr[request_starting_pt + 2];
+            uint8_t c = _newrequest.strptr[request_starting_pt + 3];
+            uint8_t d = _newrequest.strptr[request_starting_pt + 4];
+
+            CLOG_LN(a);
+            CLOG_LN(b);
+            CLOG_LN(c);
+            CLOG_LN(d);
         }
 
         if (_newrequest.length - (request_length + start_index) >= 14)

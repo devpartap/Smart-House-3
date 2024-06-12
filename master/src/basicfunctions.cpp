@@ -29,7 +29,7 @@ void CStrWithSize::print(CStrWithSize &_bstring)
 {
     for (uint16_t i = 0; i < _bstring.length; i++)
     {
-        _CslLog(_bstring.strptr[i]);
+        CLOG(_bstring.strptr[i]);
     }
-    _CslLog('\n');
+    CLOG('\n');
 }

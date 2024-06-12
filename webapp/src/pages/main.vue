@@ -5,7 +5,7 @@
     <v-app-bar :elevation="1" :height="60">
 
         <template v-slot:prepend>
-            <v-app-bar-nav-icon @click="drawer = !drawer">
+            <v-app-bar-nav-icon @click="b_drawer = !b_drawer">
                 <v-icon size="x-large">mdi-menu</v-icon>
             </v-app-bar-nav-icon>
         </template>
@@ -18,7 +18,7 @@
     </v-app-bar>
 
     <!-- ------ Main Navigation Bar ------ -->
-    <v-navigation-drawer v-model="drawer" location="left"
+    <v-navigation-b_drawer v-model="b_drawer" location="left"
         :width="360" temporary >
         
         <v-card style="padding-top: 15px;" flat>
@@ -34,7 +34,7 @@
             <v-expansion-panels v-for="floor in Object.keys($hp.layout).reverse()" :key="floor"
                                 flat>
 
-                <v-expansion-panel :title="m_getFloorName(floor)" variant="popout" eager ripple>
+                <v-expansion-panel :title="getFloorName(floor)" variant="popout" eager ripple>
                     <v-expansion-panel-text>
 
                         <v-list v-for="room in $hp.layout[floor]" 
@@ -62,7 +62,7 @@
             </v-card-subtitle>
 
         </v-card>
-    </v-navigation-drawer>
+    </v-navigation-b_drawer>
 
     
     <!-- ------ Main Page Components ------ -->
@@ -73,7 +73,7 @@
         <v-table density="comfortable">
 
 
-            <!-- <tbody v-show="readyToUse"> -->
+            <!-- <tbody v-show="b_ready_to_use"> -->
             <tbody>
                 <tr v-for="device in $hp[$global.active_room].devices" :key="device.id"  >
                     <td class="text-h6 font-weight-bold" style="color: #424242; ">
@@ -81,7 +81,7 @@
                     </td>
 
                     <td >
-                        <v-switch style="float: right;" :color="(device.state) ? 'success' : '' " hide-details inset :loading="switchloading == device.id" 
+                        <v-switch style="float: right;" :color="(device.state) ? 'success' : '' " hide-details inset :loading="switch_loading == device.id" 
                         v-model="device.state" @change="sendDeviceState($global.active_room,device.id,device.state)"></v-switch>
                     </td>                
                 </tr>
@@ -103,56 +103,46 @@ import {ref,reactive,inject} from 'vue'
 const $hp = ref(inject('$hp'))
 const $global = reactive(inject('$g'))
 
-const drawer = ref(false)
-const switchloading = ref(0.0)
+const b_drawer = ref(false)
+const b_ready_to_use = ref(false);
 
-const readyToUse = ref(false);
+const switch_loading = ref(0.0)
 
-let listColors = {
-    "light":"green",
-    "fan":"blue",
-    "strip":"yellow",
-    "switch":"gery"
-}
 
-let activecolor = ref([
-    " ",
-    "success"
-])
 
 //   --- Getting Current Roomdata ---
 
-function changeActiveRoom(_room_id_)
+function changeActiveRoom(_room_id)
 {
-    $global.active_room = _room_id_
+    $global.active_room = _room_id
 }
 
-function sendSignal(_device_id_)
+function sendSignal(_device_id)
 {
-    console.log(_device_id_)
+    console.log(_device_id)
 }
 
-function m_getFloorName(_floor_)
+function getFloorName(_floor)
 {
-    if(_floor_ == 0)
+    if(_floor == 0)
     {
         return "Ground Floor"
     }
-    if(_floor_ == 1)
+    if(_floor == 1)
     {
         return "1st Floor"
     }
-    if(_floor_ == 2)
+    if(_floor == 2)
     {
         return "2nd Floor"
     }
-    if(_floor_ == 3)
+    if(_floor == 3)
     {
         return "3rd Floor"
     }
     else
     {
-        return _floor_ + "th Floor"
+        return _floor + "th Floor"
     }
 }
 
@@ -175,10 +165,10 @@ socket.onopen = () => {
 }
 
 
-function sendDataOnWS(_DATA)
+function sendDataOnWS(_data)
 {
     return new Promise(function(resolve,reject) {
-        socket.send(_DATA);
+        socket.send(_data);
         socket.onmessage = (receved_Data) => {
             if(receved_Data[0] == '~')
             {
@@ -196,9 +186,9 @@ function sendDataOnWS(_DATA)
 async function sendDeviceState(_RoomID,_DeviceID,_state)
 {
     try{
-        switchloading.value = _DeviceID
+        switch_loading.value = _DeviceID
         let responce = await sendDataOnWS(`U ${_RoomID}.${_DeviceID}.${Number(_state)}`)
-        switchloading.value = 0
+        switch_loading.value = 0
 
         // activecolor = "success"
 
@@ -224,7 +214,7 @@ async function askFloorStatus()
         console.log(responce.data)
         console.log($hp.value['1.1'].devices)
 
-        readyToUse.value = true;
+        b_ready_to_use.value = true;
 
     } 
     catch (error) {

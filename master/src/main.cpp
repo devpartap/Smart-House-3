@@ -10,7 +10,6 @@ void errLED();
 
 void setup()
 {
-
     // -------- BOOTING ----------
     pinMode(_TEST_LED_, OUTPUT);
 
@@ -18,7 +17,7 @@ void setup()
     _ESP8266.setTimeout(15);
 
     // error checking
-#ifndef debug
+#ifndef _DEBUG_
     if (CStrWithSize::indexOf(espSendRead("AT"), "OK") == -1)
     {
         errLED();
@@ -28,22 +27,25 @@ void setup()
     // Setting Up master
     digitalWrite(_TEST_LED_, HIGH);
 
-#ifdef debug
-    _Csl(begin(115200));
+#ifdef _DEBUG_
+    CONSOLE(begin(115200));
     delay(1000);
-    _CslLogln("<<< - Start - >>> ");
+    CLOG_LN("<<< - Start - >>> ");
     espSendRead("ATE1");
 
 #else
     espSendRead("ATE0");
 #endif
 
+    espSendRead("AT+CWMODE_CUR=1");
     espSendRead("AT+CIPMUX=1");
     espSendRead("AT+CIPSERVER=1,0080");
     espSendRead("AT+CIFSR");
 
     digitalWrite(_TEST_LED_, LOW);
 }
+
+bool toconect = true;
 
 void loop()
 {
@@ -52,7 +54,12 @@ void loop()
         processRequest(espRead());
     }
 
-    //   delay(50);
+    // if(toconect)
+    // {
+    //     espWaitRead("AT+CIPSTART=4,\"TCP\",\"192.168.29.29\",8080,300");
+    //     toconect = false;
+    // }
+
 }
 
 void errLED()
