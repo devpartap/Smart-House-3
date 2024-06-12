@@ -1,7 +1,7 @@
-#include "definations.h"
+#include "definations.hpp"
 
-#include "esp8266.h"
-#include "requesthandling.h"
+#include "esp8266.hpp"
+#include "requesthandling.hpp"
 
 #define _TEST_LED_ 13
 // 192.168.29.167

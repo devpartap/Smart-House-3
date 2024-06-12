@@ -1,4 +1,4 @@
-#include "esp8266.h"
+#include "esp8266.hpp"
 
 char rx_buffer[512];
 

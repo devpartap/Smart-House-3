@@ -1,6 +1,6 @@
-#include "definations.h"
-#include "esp8266.h"
-#include "cryptography.h"
+#include "definations.hpp"
+#include "esp8266.hpp"
+#include "cryptography.hpp"
 
 #define WEBSOCKET_MESSAGE (char)129
 #define WEBSOCKET_CLOSING_HANDSHAKE (char)136

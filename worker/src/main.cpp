@@ -1,7 +1,7 @@
 #define _DEBUG_
 
-#include "definations.h"
-#include "communication.h"
+#include "definations.hpp"
+#include "communication.hpp"
 
 void setup()
 {

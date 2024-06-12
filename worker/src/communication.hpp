@@ -1,5 +1,5 @@
 #pragma once
-#include "definations.h"
+#include "definations.hpp"
 
 void sendBoardStatus(uint8_t * _switchs_status);
 void connectToWiFi();

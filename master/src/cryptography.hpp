@@ -1,5 +1,5 @@
 #pragma once
 
-#include "definations.h"
+#include "definations.hpp"
 
 CStrWithSize processWebsocketKey(const CStrWithSize &inkey);

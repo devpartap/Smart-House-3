@@ -1,6 +1,6 @@
 #pragma once
 
-#include "definations.h"
+#include "definations.hpp"
 
 CStrWithSize espRead();
 CStrWithSize espSendRead(const char *_command);

@@ -1,5 +1,5 @@
 #include <ESP8266WiFi.h>
-#include "communication.h"
+#include "communication.hpp"
 
 #define SERVER_PORT 80
 

@@ -1,9 +1,9 @@
-#include "definations.h"
+#include "definations.hpp"
+#include "esp8266.hpp"
 
-#include "esp8266.h"
+#include "workercontrol.hpp"
+#include "workerslayout.hpp"
 
-#include "workercontrol.h"
-#include "workerslayout.h"
 
 void registerStatus();
 
