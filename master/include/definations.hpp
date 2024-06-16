@@ -1,25 +1,28 @@
 #pragma once
+
 #include <Arduino.h>
 
 #define _DEBUG_
+
+
 // -- _debuggingging Stuff ---
 #ifdef _DEBUG_
 
-#define CLOG(x) Serial.print(x)
-#define CLOG_LN(x) Serial.println(x)
-#define CONSOLE(x) Serial.x
-#define LOG_ESP(x, y)              \
-    CLOG("\n----- ESP ----- "); \
-    CLOG(y);                    \
-    CLOG('\n');                 \
-    CLOG(x);                    \
-    CLOG("\n---------------\n")
+    #define CLOG(x) Serial.print(x)
+    #define CLOG_LN(x) Serial.println(x)
+    #define CONSOLE(x) Serial.x
+    #define LOG_ESP(x, y)              \
+        CLOG("\n----- ESP ----- "); \
+        CLOG(y);                    \
+        CLOG('\n');                 \
+        CLOG(x);                    \
+        CLOG("\n---------------\n")
 
 #else
-#define CLOG(x)
-#define CLOG_LN(x)
-#define CONSOLE(x)
-#define LOG_ESP(x, y)
+    #define CLOG(x)
+    #define CLOG_LN(x)
+    #define CONSOLE(x)
+    #define LOG_ESP(x, y)
 #endif
 
 #define _ESP8266 Serial3
@@ -49,3 +52,5 @@ struct CStrWithSize
     static void print(CStrWithSize &_bstring);
 #endif
 };
+
+extern const uint16_t floor_map[][2];

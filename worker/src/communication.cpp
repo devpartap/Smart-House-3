@@ -1,7 +1,13 @@
 #include <ESP8266WiFi.h>
-#include "communication.hpp"
 
-#define SERVER_PORT 80
+#include "communication.hpp"
+#include "definations.hpp"
+#include "devicecontrol.hpp"
+
+#define SERVER_PORT 8080
+
+uint8_t rx_buffer[128] = {0};
+
 
 
 const char* master_ip = "192.168.29.167";
@@ -12,18 +18,15 @@ bool connected_to_master = false;
 WiFiClient *master_order;
 WiFiServer server(SERVER_PORT);
 
-
-
-
 enum RequestType : char
 {
     WORKERSTATUS = 'W',
 };
 
-// void startServer()
-// {
-//     server.begin();
-// }
+void startServer()
+{
+    server.begin();
+}
 
 void connectToMaster()
 {
@@ -36,13 +39,40 @@ void connectToMaster()
         CLOG(".");
     }
     CLOG_LN("Connected!");
+
+    char device_Status_compressed[2+ (uint8_t)((g_no_of_devices-1)/8)];
+    compressDevicesState(device_Status_compressed);
+
     to_master.print(' ');
+
     to_master.print(RequestType::WORKERSTATUS);
+
     to_master.write(g_floor_id);
     to_master.write(g_room_id);
     to_master.write(g_board_id);
-    to_master.print('a');
 
+    to_master.print((const char*)(&g_ip[8]));
+    to_master.print('-');
+
+    to_master.write(g_no_of_devices);
+    to_master.print((const char*) &(device_Status_compressed[0]));
+
+    delay(10);
+
+    while (!to_master.available())
+    {    }
+
+    char sl = to_master.read();
+    if(sl == 'k')
+    {
+        connected_to_master = true;
+        CLOG("Master acknowledged!");
+    }
+    else
+    {
+        CLOG("acknowledge error!");
+    }
+ 
     to_master.stop();
     
 }
@@ -59,11 +89,39 @@ void connectToWiFi()
     }
     CLOG_LN(' ');
 
+    WiFi.localIP().toString().toCharArray(&g_ip[0],16);
+
     CLOG("Connected, IP address: ");
-    CLOG_LN(WiFi.localIP());
+    CLOG_LN(g_ip);
+    
 }
 
-void sendBoardStatus(uint8_t * _switchs_status)
+void listenForMaster()
 {
+    WiFiClient master = server.accept();
 
+    if (master.connected())
+    {
+        CLOG_LN("Master Here!");
+
+        while(!master.available())
+        { }
+
+        while(master.available())
+        {
+            rx_buffer[rx_buffer[0]+1] = master.read();
+            rx_buffer[0] += 1;
+        }
+
+
+        for(uint8_t i = 1; i <= rx_buffer[0];i++)
+        {
+            CLOG(rx_buffer[i]);
+            CLOG('-');
+        }
+        
+            CLOG_LN('|');
+    }
+
+    master.stop();
 }

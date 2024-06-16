@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 // --------- Type Defs ---------
 enum DeviceType : int8_t
@@ -9,78 +10,95 @@ enum DeviceType : int8_t
     Power_Socket
 
 };
-// --------- Structures ---------
-struct BoardDS
+
+// --------- DATA STRUCTURES ---------
+struct WorkerDS
 {
-    const char *ip;
+    unsigned char ip[8];
     bool active;
-    uint16_t device_itterations;
+    uint8_t device_iterations_sp;
+    uint8_t no_of_devices;
 
-    BoardDS(const char *_ip, const uint16_t &_device_itterations)
-        : ip(_ip), active(false), device_itterations(device_itterations)
+    WorkerDS(const uint8_t &_device_iterations_sp,const uint8_t & _no_of_devices)
+            :active(false), device_iterations_sp(_device_iterations_sp),
+            no_of_devices(_no_of_devices)
     {
     }
 };
 
-struct RoomMapPtr
+struct RoomDS
 {
-    BoardDS *BoardList;
-    uint8_t *DeviceList;
-    uint8_t noBoards;
+    WorkerDS *board_list;
+    int8_t *device_list;
+    uint8_t no_of_boards;
+    uint16_t no_of_devices;
 
-    RoomMapPtr(BoardDS *_BoardList, uint8_t *_DeviceList, const uint8_t &_noBoards)
-        : BoardList(_BoardList), DeviceList(_DeviceList), noBoards(_noBoards)
+    RoomDS(WorkerDS *_board_list, int8_t *_device_list, uint8_t _no_of_boards, uint16_t _no_of_devices)
+            : board_list(_board_list), device_list(_device_list), no_of_boards(_no_of_boards),
+              no_of_devices(_no_of_devices)
     {
     }
 };
 
-// // --------- Storage ---------
+// --------- STORAGE ---------
 
-int8_t F0_R1_State[] = {
-    -(DeviceType::Light),
-    -(DeviceType::Light)};
+// --- Devices' Layout
+int8_t F0_R0_state[] = {
+        -(DeviceType::Light),
+        -(DeviceType::Light)
+};
 
-int8_t F1_R1_State[] = {
-    -(DeviceType::Light),
-    -(DeviceType::Light),
-    -(DeviceType::Light),
-    -(DeviceType::Led_Strip),
-    -(DeviceType::Led_Strip),
-    -(DeviceType::Fan),
-    -(DeviceType::Power_Socket)};
+int8_t F1_R0_state[] = {
+        -(DeviceType::Light),
+        -(DeviceType::Light),
+        -(DeviceType::Light),
+        -(DeviceType::Led_Strip),
+        -(DeviceType::Led_Strip),
+        -(DeviceType::Fan),
+        -(DeviceType::Power_Socket)
+};
 
-int8_t F0_R2_State[] = {
-    -(DeviceType::Light),
-    -(DeviceType::Light),
-    -(DeviceType::Light),
-    -(DeviceType::Fan),
-    -(DeviceType::Light),
-    -(DeviceType::Light),
-    -(DeviceType::Power_Socket),
-    -(DeviceType::Fan),
-    -(DeviceType::Power_Socket)};
+int8_t F1_R1_state[] = {
+        -(DeviceType::Light),
+        -(DeviceType::Light),
+        -(DeviceType::Light),
+        -(DeviceType::Fan),
+        -(DeviceType::Light),
+        -(DeviceType::Light),
+        -(DeviceType::Power_Socket),
+        -(DeviceType::Fan),
+        -(DeviceType::Power_Socket)
+};
 
-BoardDS RoomMap_F0_R1[] = {
-    BoardDS("29.101", 1)};
 
-BoardDS RoomMap_F1_R1[] = {
-    BoardDS("29.102", 4),
-    BoardDS("29.103", 6)};
+// --- Boards' Layout
+WorkerDS F0_R0_room_map[] = {
+        WorkerDS(0,2)
+};
 
-BoardDS RoomMap_F1_R2[] = {
-    BoardDS("29.104", 3),
-    BoardDS("29.105", 6),
-    BoardDS("29.106", 8)};
+WorkerDS F1_R0_room_map[] = {
+        WorkerDS(0,7),
+        // WorkerDS(5,2)
+};
 
-// --------- Maps ---------
+WorkerDS F1_R1_room_map[] = {
+        WorkerDS(0,9),
+        // WorkerDS(5,2),
+        // WorkerDS(7,2)
+};
 
-RoomMapPtr RoomMap[] = {
-    RoomMapPtr(RoomMap_F0_R1, F0_R1_State, 1),
-    RoomMapPtr(RoomMap_F1_R1, F1_R1_State, 1),
-    RoomMapPtr(RoomMap_F1_R2, F0_R2_State, 1)};
 
-uint8_t floorMap[] = {
-    1,
-    2};
 
-// 1.1 1.2
+// --------- MAPS ---------
+
+RoomDS room_map[] = {
+        RoomDS(F0_R0_room_map, F0_R0_state, 1,2), //no boards, no devices
+        RoomDS(F1_R0_room_map, F1_R0_state, 2,7),
+        RoomDS(F1_R1_room_map, F1_R1_state, 3,9)
+
+};
+
+const uint16_t floor_map[][2] = { // these numbers should not be 0
+        {1,2}, // Room Index Range, No of rooms, No of Boards, 
+        {3,16}
+};

@@ -54,12 +54,6 @@ void loop()
         processRequest(espRead());
     }
 
-    // if(toconect)
-    // {
-    //     espWaitRead("AT+CIPSTART=4,\"TCP\",\"192.168.29.29\",8080,300");
-    //     toconect = false;
-    // }
-
 }
 
 void errLED()

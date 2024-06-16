@@ -17,8 +17,9 @@
         </v-badge>
     </v-app-bar>
 
+
     <!-- ------ Main Navigation Bar ------ -->
-    <v-navigation-b_drawer v-model="b_drawer" location="left"
+    <v-navigation-drawer v-model="b_drawer" location="left"
         :width="360" temporary >
         
         <v-card style="padding-top: 15px;" flat>
@@ -62,7 +63,7 @@
             </v-card-subtitle>
 
         </v-card>
-    </v-navigation-b_drawer>
+    </v-navigation-drawer>
 
     
     <!-- ------ Main Page Components ------ -->
@@ -185,11 +186,13 @@ function sendDataOnWS(_data)
 
 async function sendDeviceState(_RoomID,_DeviceID,_state)
 {
+    // TODO: IMPROVE THIS COMUNICATION
     try{
         switch_loading.value = _DeviceID
+
         let responce = await sendDataOnWS(`U ${_RoomID}.${_DeviceID}.${Number(_state)}`)
         switch_loading.value = 0
-
+        console.log(responce.data)
         // activecolor = "success"
 
     } 
@@ -207,7 +210,8 @@ async function askFloorStatus()
 
         $hp.value.layout[Math.trunc($global.active_room)].forEach((ele) => {
             $hp.value[ele].devices.forEach((div) => {
-                div.state = (responce.data[i] === '1')
+
+                div.state = Boolean(responce.data[i] == '1');
                 i++;
             })
         })

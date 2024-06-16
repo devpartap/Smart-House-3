@@ -33,12 +33,40 @@ CStrWithSize espRead()
 #endif
 }
 
+void espSend(const char _conection_no,const char * _msg, uint8_t _msglen)
+{
+    _ESP8266.print("AT+CIPSEND=");
+    _ESP8266.print(_conection_no);
+    _ESP8266.print(",");
+    _ESP8266.println(_msglen + 1);
+    delay(10);
+
+    _ESP8266.println(_msg);
+}
+
+void espSendChar(const char _conection_no,const char _msg)
+{
+    _ESP8266.print("AT+CIPSEND=");
+    _ESP8266.print(_conection_no);
+    _ESP8266.print(",");
+    _ESP8266.println(1);
+    delay(10);
+
+    _ESP8266.print(_msg);
+}
+
+void espClose(char _conection_no)
+{
+    _ESP8266.print("AT+CIPCLOSE=");
+    _ESP8266.println(_conection_no);
+}
+
 int espAvailable()
 {
     return _ESP8266.available();
 }
 
-void espConnectWebSocket(const char &_conection_no, const CStrWithSize &_respondkey)
+void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondkey)
 {
 
     _ESP8266.print("AT+CIPSEND=");
@@ -61,22 +89,62 @@ void espConnectWebSocket(const char &_conection_no, const CStrWithSize &_respond
     _ESP8266.flush();
 }
 
-void sendDataOnWebSocket(const char &_connection_no, const char *_data)
+void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t & _size)
 {
-
-    uint8_t datalength = strlen(_data);
-
     _ESP8266.print("AT+CIPSEND=");
     _ESP8266.print(_connection_no);
     _ESP8266.print(",");
-    _ESP8266.println(datalength + 2);
-    delay(10);
 
+    if(_size > 125)
+    {
+        _ESP8266.println(_size + 3);
+    }
+    else
+    {
+        _ESP8266.println(_size + 2);
+    }
+    delay(10);
+    
     _ESP8266.print((char)0b10000001);
-    _ESP8266.print((char)((datalength) & 0b01111111));
-    _ESP8266.println(_data);
+
+    if(_size > 125)
+    {
+        _ESP8266.print((char)(0b01111110));
+        _ESP8266.print(_size);
+    }
+    else
+    {
+        _ESP8266.print((char)(_size));
+    }
+       
+    _ESP8266.write(_data,_size);
 
     _ESP8266.flush();
+}
+
+void sendDataOnWebSocket(const char _connection_no, const char *_data)
+{
+    sendDataOnWebSocket(_connection_no,(char*)_data[0], strlen(_data));
+}
+
+void sendWorkerCommand(const char* ip,const char* command)
+{
+    _ESP8266.print("AT+CIPSTART=4,\"TCP\",\"192.168.");
+    _ESP8266.print(ip);
+    _ESP8266.println("\",8080,30");
+    
+    delay(100);
+
+    uint8_t command_length = strlen(command);
+    _ESP8266.print("AT+CIPSEND=4,");
+    _ESP8266.println(command_length);
+    delay(10);
+
+    CLOG_LN(command);
+    _ESP8266.write(command,command_length);
+    _ESP8266.flush();
+
+    // _ESP8266.println(command);
 }
 
 void connectToIt()
