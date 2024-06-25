@@ -7,6 +7,7 @@
 #define SERVER_PORT 8080
 
 uint8_t rx_buffer[128] = {0};
+uint8_t buffer_size = 0;
 
 
 
@@ -107,20 +108,17 @@ void listenForMaster()
         while(!master.available())
         { }
 
-        while(master.available())
-        {
-            rx_buffer[rx_buffer[0]+1] = master.read();
-            rx_buffer[0] += 1;
-        }
+        buffer_size = master.read(rx_buffer,127);
 
-
-        for(uint8_t i = 1; i <= rx_buffer[0];i++)
+        for(uint8_t i = 0; i < buffer_size;i++)
         {
             CLOG(rx_buffer[i]);
             CLOG('-');
         }
         
             CLOG_LN('|');
+
+        master.write('K');
     }
 
     master.stop();

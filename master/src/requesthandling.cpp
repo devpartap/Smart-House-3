@@ -67,8 +67,6 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
                 // to_send_Data[floor_map[floor][1]] = '\0';
 
                 getFloorStatus(floor,to_send_Data);
-
-                // sendDataOnWebSocket(connection_no,(const char*)to_send_Data);
                 sendDataOnWebSocket(connection_no,to_send_Data,floor_map[floor][1]);
             }
 
@@ -78,6 +76,7 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
 
                 uint8_t info_type = 0;
                 uint8_t i = 2;
+
                 for (; i < request_length - 7; i++)
                 {
                     if (msg[i] == '.')
@@ -96,17 +95,16 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
                 decive_change_data[3] -= 1;
                 decive_change_data[4] = msg[i] - '0';
                
-                if(chnageDeviceState(decive_change_data))
+                if(changeDeviceState(decive_change_data))
                 {
-                     delay(100);
-                    CLOG("inhere!");
+                    delay(30);
                     sendDataOnWebSocket(connection_no, "OK");
                 }
                 else
-                {
-                     delay(100);
-                    CLOG("innothere!");
-                    sendDataOnWebSocket(connection_no, "~");
+                { 
+                    CLOG_LN("NK");
+                    delay(30);
+                    sendDataOnWebSocket(connection_no, "NK");
                 }
 
             }

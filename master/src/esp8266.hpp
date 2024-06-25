@@ -18,6 +18,6 @@ void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondk
 void sendDataOnWebSocket(const char _connection_no, const char *_data);
 void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t & _size);
 
-void sendWorkerCommand(const char* ip,const char* command);
+void sendWorkerCommand(const char* _ip,const uint8_t * _command,const uint8_t _size);
 
 // void sendWebsocketPing(const char & _ConnectionNO);

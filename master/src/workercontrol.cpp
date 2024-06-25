@@ -7,8 +7,7 @@
 
 void registerWorker(const uint8_t *_worker_data)
 {
-    uint8_t room_space = (_worker_data[0] == 0) ? _worker_data[1] : floor_map[_worker_data[0] - 1][0] + _worker_data[1];
-    WorkerDS *active_board = &room_map[room_space].board_list[_worker_data[2]];
+    WorkerDS * active_board = ACTIVEBOARD(_worker_data[0],_worker_data[1],_worker_data[2]);
 
     active_board->active = true;
 
@@ -21,19 +20,28 @@ void registerWorker(const uint8_t *_worker_data)
     irr = irr + 1;
 
     uint8_t tmp;
-    for (uint8_t i = active_board->device_iterations_sp;
-         i < active_board->device_iterations_sp + _worker_data[irr];
-         i++)
+    for (uint8_t i = 0; i < _worker_data[irr]; i++)
     {
         tmp = _worker_data[irr + 1 + (uint8_t)(i / 8)];
         tmp = tmp << (uint8_t)(i % 8);
 
-        if ((room_map[room_space].device_list[i] & 0b10000000) == (tmp & 0b10000000)) // here the 0 in tmp indicates off but 0 in device list
+        if ((active_board->device_list[i] & 0b10000000) == (tmp & 0b10000000)) // here the 0 in tmp indicates off but 0 in device list
         {                                                                             // indicates 1 so that's why using '=' instead of  '!='
-            room_map[room_space].device_list[i] *= -1;
+            active_board->device_list[i] *= -1;
         }
 
     }
+
+#ifdef _DEBUG_
+    for(uint8_t i = 0; i < active_board->no_of_devices; i++)
+    {
+        CLOG(active_board->device_list[i]);
+        CLOG(' ');
+    }
+    CLOG_LN(' ');
+
+#endif
+
 }
 
 void getFloorStatus(uint8_t floor,char* to_send)
@@ -43,20 +51,20 @@ void getFloorStatus(uint8_t floor,char* to_send)
      for(uint16_t i = (floor == 0) ? 0 : floor_map[floor - 1][0]; 
                   i < floor_map[floor][0]; i++)
     {
-        for(uint8_t j = 0; j < room_map[i].no_of_devices; j++)
+        for(uint8_t j = 0; j < room_map[i].no_of_boards; j++)
         {
-            // to_send[space_irr] = ((~room_map[i].device_list[j]) & (uint8_t)0b10000000) >> 7;
-            // space_irr++;
-
-            if((room_map[i].device_list[j] & (uint8_t)0b10000000) == (uint8_t)0b10000000)
+            for(uint8_t k = 0; k < room_map[i].board_list[j].no_of_devices; k++)
             {
-                to_send[space_irr] = '0';
+                if(room_map[i].board_list[j].device_list[k] < 0)
+                {
+                    to_send[space_irr] = '0';
+                }
+                else
+                {
+                    to_send[space_irr] = '1';
+                }
+                space_irr++;
             }
-            else
-            {
-                to_send[space_irr] = '1';
-            }
-            space_irr++;
         }
     }
 
@@ -73,20 +81,26 @@ void getFloorStatus(uint8_t floor,char* to_send)
 
 }
 
-bool chnageDeviceState(const uint8_t * _worker_data)
+bool changeDeviceState(const uint8_t * _worker_data)
 {
     // Discrypted char :- U| |1|.|2|.|1|.|7|.|0|
-    uint8_t room_space = (_worker_data[0] == 0) ? _worker_data[1] : floor_map[_worker_data[0] - 1][0] + _worker_data[1];
-    WorkerDS *active_board = &room_map[room_space].board_list[_worker_data[2]];
-    
+
+    WorkerDS *active_board = ACTIVEBOARD(_worker_data[0],_worker_data[1],_worker_data[2]);
+
     if(!active_board->active)
     {
         return false;
     }
     
+    const uint8_t command[3] = {'T',_worker_data[3],_worker_data[4]};
 
-    const char command[4] = {'T',_worker_data[3],_worker_data[4],'\0'};
-    sendWorkerCommand((const char*)active_board->ip,(const char*)command);
+    sendWorkerCommand((const char*)active_board->ip,command,3);
+
+    if((_worker_data[4]) == ((active_board->device_list[_worker_data[3]] & 0b10000000) >> 7))
+    {
+        active_board->device_list[_worker_data[3]] *= -1;
+    }
+    
     return true;
 }
 

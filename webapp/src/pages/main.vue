@@ -165,13 +165,17 @@ socket.onopen = () => {
     askFloorStatus()
 }
 
+socket.onclose = () => {
+    console.log("Connection Closed!")
+}
+
 
 function sendDataOnWS(_data)
 {
     return new Promise(function(resolve,reject) {
         socket.send(_data);
         socket.onmessage = (receved_Data) => {
-            if(receved_Data[0] == '~')
+            if(receved_Data[0] == 'NK')
             {
                 reject(receved_Data)
             }

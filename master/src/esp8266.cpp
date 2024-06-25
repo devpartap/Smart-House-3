@@ -150,24 +150,44 @@ void sendDataOnWebSocket(const char _connection_no, const char *_data)
     sendDataOnWebSocket(_connection_no,(char*)_data[0], strlen(_data));
 }
 
-void sendWorkerCommand(const char* ip,const char* command)
+void connectWroker(const char* _ip)
 {
     _ESP8266.print("AT+CIPSTART=4,\"TCP\",\"192.168.");
-    _ESP8266.print(ip);
+    _ESP8266.print(_ip);
     _ESP8266.println("\",8080,30");
-    
-    delay(100);
-
-    uint8_t command_length = strlen(command);
-    _ESP8266.print("AT+CIPSEND=4,");
-    _ESP8266.println(command_length);
-    delay(10);
-
-    CLOG_LN(command);
-    _ESP8266.write(command,command_length);
     _ESP8266.flush();
 
-    // _ESP8266.println(command);
+    while(true) 
+    { 
+        if(_ESP8266.available())
+        {
+            if (CStrWithSize::indexOf(espRead(), "4,C") != -1)
+                break;
+        }
+        
+    }
+  
+}
+
+void sendWorkerCommand(const char* _ip,const uint8_t * _command,const uint8_t _size)
+{
+    connectWroker(_ip);
+
+    _ESP8266.print("AT+CIPSEND=4,");
+    _ESP8266.println(_size);
+    delay(10);
+
+#ifdef _DEBUG_
+    for(uint8_t i = 0; i < _size; i++)
+    {
+        CLOG(_command[i]);
+    }
+    CLOG_LN(' ');
+#endif
+
+    _ESP8266.write(_command,_size);
+    _ESP8266.flush();
+
 }
 
 void connectToIt()
