@@ -17,8 +17,11 @@ CStrWithSize espWaitRead(const char * _command)
     _ESP8266.flush();
     delay(10);
 
-    while(!_ESP8266.available()) { }
-        return espRead();
+    while(!_ESP8266.available()) { 
+        delay(50);
+    }
+    
+    return espRead();
 }
 
 CStrWithSize espRead()
@@ -64,6 +67,26 @@ void espClose(char _conection_no)
 int espAvailable()
 {
     return _ESP8266.available();
+}
+
+void espConnectAP()
+{
+    if (CStrWithSize::indexOf(espSendRead("AT+CIFSR"), "0.0.0.0") == 1)
+    {
+        _ESP8266.print("AT+CWJAP=\"");
+        _ESP8266.print(g_wifi_ssid);
+        _ESP8266.print("\",\"");
+        _ESP8266.print(g_wifi_password);
+        _ESP8266.println('"');
+
+        _ESP8266.flush();
+    
+        while(!_ESP8266.available()) { 
+            delay(50);
+        }
+    }
+
+
 }
 
 void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondkey)

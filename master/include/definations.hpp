@@ -5,7 +5,7 @@
 #define _DEBUG_
 
 
-// -- _debuggingging Stuff ---
+// --- debuggingging Stuff ---
 #ifdef _DEBUG_
 
     #define CLOG(x) Serial.print(x)
@@ -26,6 +26,13 @@
 #endif
 
 #define _ESP8266 Serial3
+
+// --- Global Veriables ---
+
+inline char g_wifi_ssid[] = {'B','o','g','a','l','s',' ','W','i','F','i','\0'};
+inline char g_wifi_password[] = {'B','o','g','a','l','s','w','i','f','i','7','\0'};
+// inline char g_wifi_ssid[] = {'H','a','r','v','i','n','d','e','r',' ','S','i','n','g','h','\0'};
+// inline char g_wifi_password[] = {'g','u','r','j','o','t','2','0','5','0','\0'};
 
 struct CStrWithSize
 {

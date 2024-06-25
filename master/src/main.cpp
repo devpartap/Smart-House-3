@@ -37,15 +37,15 @@ void setup()
     espSendRead("ATE0");
 #endif
 
+    delay(10);
     espSendRead("AT+CWMODE_CUR=1");
     espSendRead("AT+CIPMUX=1");
     espSendRead("AT+CIPSERVER=1,0080");
-    espSendRead("AT+CIFSR");
+
+    espConnectAP();
 
     digitalWrite(_TEST_LED_, LOW);
 }
-
-bool toconect = true;
 
 void loop()
 {

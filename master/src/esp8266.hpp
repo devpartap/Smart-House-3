@@ -11,6 +11,7 @@ void espSendChar(char _conection_no,const char _msg);
 
 int espAvailable();
 void espClose(char _conection_no);
+void espConnectAP();
 
 void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondkey);
 
