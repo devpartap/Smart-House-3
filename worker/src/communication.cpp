@@ -81,6 +81,7 @@ void connectToMaster()
 void connectToWiFi()
 {
     WiFi.begin(g_wifi_ssid, g_wifi_password);
+    WiFi.mode(WIFI_STA);
     
     CLOG("Connecting");
     while (WiFi.status() != WL_CONNECTED)

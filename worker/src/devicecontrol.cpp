@@ -20,7 +20,7 @@ void compressDevicesState(char * arry)
     for(uint8_t i = 0; i < g_no_of_devices; i++)
     {
         CLOG_LN((uint8_t)arry[0]);
-        tmp = ConnectedDevices[i].m_state;
+        tmp = ConnectedDevices[i].m_relay_state;
         tmp = tmp << (7-(i%8));
         arry[i/8] +=  tmp;
         
@@ -37,4 +37,13 @@ void compressDevicesState(char * arry)
     CLOG_LN(' ');
 
 #endif
+}
+
+void setPinMode()
+{
+    // for(uint8_t i = 0; i < g_no_of_devices; i++)
+    // {
+    //     pinMode(ConnectedDevices.m_pin,)
+        
+    // }
 }

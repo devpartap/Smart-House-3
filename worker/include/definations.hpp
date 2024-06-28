@@ -11,10 +11,20 @@
 
 #define RANDOM_SEED_PIN A0
 #define MAX_ARRANGE_TIME 1000
+#define OTA_PORT 8266
+
+// --- CONSTANTS ---
+
+inline char g_wifi_ssid[] = {'B','o','g','a','l','s',' ','W','i','F','i','\0'};
+inline char g_wifi_password[] = {'B','o','g','a','l','s','w','i','f','i','7','\0'};
+// inline char g_wifi_ssid[] = {'H','a','r','v','i','n','d','e','r',' ','S','i','n','g','h','\0'};
+// inline char g_wifi_password[] = {'g','u','r','j','o','t','2','0','5','0','\0'};
+inline char g_ip[16];
+
 
 // --- DEBUGGING STUFF ---
-#ifdef _DEBUG_
 
+#ifdef _DEBUG_
 #define CLOG(x) Serial.print(x)
 #define CLOG_LN(x) Serial.println(x)
 #define CONSOLE(x) Serial.x
@@ -23,16 +33,9 @@
 #define CLOG(x)
 #define CLOG_LN(x)
 #define CONSOLE(x)
+
 #endif
 
-// --- CONSTANTS ---
-
-inline char g_wifi_ssid[] = {'B','o','g','a','l','s',' ','W','i','F','i','\0'};
-inline char g_wifi_password[] = {'B','o','g','a','l','s','w','i','f','i','7','\0'};
-// inline char g_wifi_ssid[] = {'H','a','r','v','i','n','d','e','r',' ','S','i','n','g','h','\0'};
-// inline char g_wifi_password[] = {'g','u','r','j','o','t','2','0','5','0','\0'};
-
-inline char g_ip[16];
 
 // --- BOARD DEPENDENT STUFF ---
 
