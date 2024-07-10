@@ -31,14 +31,35 @@ void startServer()
 
 void connectToMaster()
 {
+    CLOG_LN("\n === CONNECTING TO MASTER ===");
+
+    randomSeed(analogRead(RANDOM_SEED_PIN));
+#ifdef _DEBUG_
+    uint16 max_arrange_time = random(100,MAX_ARRANGE_TIME);
+    CLOG("Wait : ");
+    CLOG_LN(max_arrange_time);
+    delay(random(100,max_arrange_time));
+
+#else
+    delay(random(100,MAX_ARRANGE_TIME));
+    
+#endif
+
     WiFiClient to_master;
 
-    CLOG("Connecting to master ");
+    uint8_t loopcount = 0;
     while (to_master.connect(master_ip, master_port) == false)
     {
-        delay(400);
+        if(loopcount == 20)
+        {
+            CLOG_LN("Master Not Connected!");
+            return;
+        }
+
         CLOG(".");
+        loopcount++;
     }
+
     CLOG_LN("Connected!");
 
     char device_Status_compressed[2+ (uint8_t)((g_no_of_devices-1)/8)];
@@ -67,19 +88,22 @@ void connectToMaster()
     if(sl == 'k')
     {
         connected_to_master = true;
-        CLOG("Master acknowledged!");
+        CLOG_LN("Master acknowledged!");
     }
     else
     {
-        CLOG("acknowledge error!");
+        CLOG_LN("acknowledge error!");
     }
  
     to_master.stop();
     
+    CLOG_LN("Done");
 }
 
 void connectToWiFi()
 {
+    CLOG_LN("\n === SETTING UP WIFI ===");
+
     WiFi.begin(g_wifi_ssid, g_wifi_password);
     WiFi.mode(WIFI_STA);
     
@@ -95,7 +119,25 @@ void connectToWiFi()
 
     CLOG("Connected, IP address: ");
     CLOG_LN(g_ip);
+    CLOG_LN("Done");
     
+}
+
+void processOrder()
+{
+    if(rx_buffer[0] == 0)
+    {
+
+    }
+    else if(rx_buffer[0] == 1)
+    {
+        changeDeviceState(rx_buffer[1],(bool)rx_buffer[2]);
+    }
+    else
+    {
+        CLOG_LN("UNKNOWN ORDER!");
+    }
+
 }
 
 void listenForMaster()
@@ -104,23 +146,37 @@ void listenForMaster()
 
     if (master.connected())
     {
-        CLOG_LN("Master Here!");
-
-        while(!master.available())
-        { }
-
-        buffer_size = master.read(rx_buffer,127);
-
-        for(uint8_t i = 0; i < buffer_size;i++)
+        for(uint8_t i = 0; i < 200; i++)
         {
-            CLOG(rx_buffer[i]);
-            CLOG('-');
+            if(master.available())
+            {
+                CLOG_LN("Master Here!");
+                buffer_size = master.read(rx_buffer,127);
+
+#ifdef _DEBUG_
+                for(uint8_t i = 0; i < buffer_size;i++)
+                {
+                    CLOG(rx_buffer[i]);
+                    CLOG('-');
+                }
+                CLOG_LN(' ');
+#endif
+
+                master.write('K');
+                master.stop();
+
+                processOrder();
+                break;
+            }
+            delay(50);
+            CLOG_LN("checking!!");
         }
         
-            CLOG_LN('|');
-
-        master.write('K');
+    }
+    else
+    {
+        master.stop();
     }
 
-    master.stop();
+    
 }

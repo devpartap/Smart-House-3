@@ -9,9 +9,10 @@
 
 void setupOTA()
 {
+    CLOG_LN("\n=== SETTING UP OTA ===");
+
     ArduinoOTA.setPort(OTA_PORT);
     
-
 #ifdef _DEBUG_
 
     ArduinoOTA.onStart([]() {
@@ -68,8 +69,7 @@ void setupOTA()
 #endif
 
     ArduinoOTA.begin();
-    CLOG("OTA Setup Done!");
-
+    CLOG_LN("Done");
 }
 
 void handleOTA()

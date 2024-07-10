@@ -32,6 +32,7 @@ void setup()
     delay(1000);
     CLOG_LN("<<< - Start - >>> ");
     espSendRead("ATE1");
+    
 
 #else
     espSendRead("ATE0");
@@ -49,10 +50,12 @@ void setup()
 
 void loop()
 {
+
     if (espAvailable() > 14)
     {
         processRequest(espRead());
     }
+    
 
 }
 

@@ -46,3 +46,20 @@ can't use
 7
 8
 11
+
+
+
+
+test relay
+D1
+D2
+D6
+D8
+
+
+
+test switch
+RX 3
+D7
+SD2 9
+SD3 10

@@ -49,3 +49,23 @@ app.provide('$g', {
 app.use(router)
 app.use(vuetify)
 app.mount('#app')
+
+// ,
+//             {
+//                 "id":1.5,
+//                 "name":"Inner Middle Strip",
+//                 "type":"light",
+//                 "state":false
+//             },
+//             {
+//                 "id":1.6,
+//                 "name":"Fan",
+//                 "type":"fan",
+//                 "state":false
+//             },
+//             {
+//                 "id":1.7,
+//                 "name":"Switch One",
+//                 "type":"switch",
+//                 "state":false
+//             }

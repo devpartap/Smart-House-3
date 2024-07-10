@@ -7,15 +7,18 @@
 // --- Devices & State ---
 
 struct Device {
+
+    const uint8_t m_relay_pin;
+    const uint8_t m_switch_pin;
     bool m_relay_state;
     bool m_switch_state;
-    const char * m_relay_pin;
-    const char * m_switch_pin;
 
-    Device(const char* _relay_pin, const char * _switch_pin,bool _relay_state = false)
-        :m_relay_pin(_relay_pin), m_switch_pin(_switch_pin),
-         m_relay_state(_relay_state), m_switch_state(false) 
-    { }
+    uint8_t m_eeprom_index;
+
+    Device(const uint8_t _relay_pin, const uint8_t _switch_pin)
+        :m_relay_pin(_relay_pin), m_switch_pin(_switch_pin)
+    { 
+    }
 
     Device() = delete;
 };
@@ -23,15 +26,15 @@ struct Device {
 #if _ACTIVE_BOARD(1,0,0)
 
     Device ConnectedDevices[] = {
-        // Device("D0"),
-        // Device(false,"D1"),
-        // Device(false,"D2"),
-        // Device(true,"D3"),
+        Device(D1,D5),
+        Device(D2,D7),
+        Device(D6,9),
+        Device(D8,10),
         // Device(true,"D4"),
         // Device(false,"D5"),
         // Device(true,"D6"),
     };
-    const uint8_t g_no_of_devices = 7; 
+    const uint8_t g_no_of_devices = 4; 
 
 #elif _ACTIVE_BOARD(1,1,0)
 

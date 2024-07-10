@@ -24,6 +24,38 @@ CStrWithSize espWaitRead(const char * _command)
     return espRead();
 }
 
+void espWaitTillFree()
+{
+    for(uint8_t i = 0; i < 100; i++)
+    {
+        _ESP8266.println("AT");
+        _ESP8266.flush();
+        delay(10);
+
+        if(CStrWithSize::indexOf(espRead(),"busy") == -1)
+        {
+            break;
+        }
+    }
+}
+
+// bool espWaitTill(const char * _word,const uint16_t _wait)
+// {
+//     for(uint16_t i = 0; i < _wait; i += 20)
+//     {
+//         if(_ESP8266.available())
+//         {
+//             if(CStrWithSize::indexOf(espRead(),_word) != -1 )
+//             {
+//                 return true;
+//             }
+//         }
+//         delay(20);
+//     }
+
+//     return false;
+// }
+
 CStrWithSize espRead()
 {
 #ifdef _DEBUG_
@@ -58,15 +90,15 @@ void espSendChar(const char _conection_no,const char _msg)
     _ESP8266.print(_msg);
 }
 
+int espAvailable()
+{
+    return _ESP8266.available();
+}
+
 void espClose(char _conection_no)
 {
     _ESP8266.print("AT+CIPCLOSE=");
     _ESP8266.println(_conection_no);
-}
-
-int espAvailable()
-{
-    return _ESP8266.available();
 }
 
 void espConnectAP()

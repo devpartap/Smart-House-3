@@ -50,9 +50,9 @@ int8_t F1_R0_B0_state[] = {
         -(DeviceType::Light),
         -(DeviceType::Light),
         -(DeviceType::Led_Strip),
-        -(DeviceType::Led_Strip),
-        -(DeviceType::Fan),
-        -(DeviceType::Power_Socket)
+        // -(DeviceType::Led_Strip),
+        // -(DeviceType::Fan),
+        // -(DeviceType::Power_Socket)
 };
 
 int8_t F1_R1_B0_state[] = {
@@ -74,7 +74,8 @@ WorkerDS F0_R0_room_map[] = {
 };
 
 WorkerDS F1_R0_room_map[] = {
-        WorkerDS(F1_R0_B0_state,7),
+        WorkerDS(F1_R0_B0_state,4),
+        // WorkerDS(F1_R0_B0_state,7),
         // WorkerDS(5,2)
 };
 
@@ -97,7 +98,7 @@ RoomDS room_map[] = {
 
 const uint16_t floor_map[][2] = { // these numbers should not be 0
         {1,2}, // Room Index Range, No of rooms,
-        {3,16}
+        {3,13}
 };
 
 #define ACTIVEROOM(x,y) &room_map[((x == 0) ? y : floor_map[x - 1][0] + y)]

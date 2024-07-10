@@ -25,6 +25,7 @@ int16_t CStrWithSize::indexOf(const CStrWithSize &_bsting, const char *_tofindin
     return -1;
 }
 
+#ifdef _DEBUG_
 void CStrWithSize::print(CStrWithSize &_bstring)
 {
     for (uint16_t i = 0; i < _bstring.length; i++)
@@ -33,3 +34,5 @@ void CStrWithSize::print(CStrWithSize &_bstring)
     }
     CLOG('\n');
 }
+
+#endif

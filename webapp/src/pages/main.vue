@@ -151,10 +151,6 @@ function getFloorName(_floor)
 
 const socket = new WebSocket('ws://192.168.29.167/a-')
 
-//TESTING SERVER
-// const socket = new WebSocket('ws://192.168.29.7:8080')
-
-
 socket.onmessage = ({data}) => {
     console.log("Recieved : - ", data);
 

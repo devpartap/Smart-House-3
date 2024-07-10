@@ -92,15 +92,15 @@ bool changeDeviceState(const uint8_t * _worker_data)
         return false;
     }
     
-    const uint8_t command[3] = {'T',_worker_data[3],_worker_data[4]};
+    const uint8_t command[3] = {1,_worker_data[3],_worker_data[4]};
 
     sendWorkerCommand((const char*)active_board->ip,command,3);
-
+    
     if((_worker_data[4]) == ((active_board->device_list[_worker_data[3]] & 0b10000000) >> 7))
     {
         active_board->device_list[_worker_data[3]] *= -1;
     }
-    
+
     return true;
 }
 

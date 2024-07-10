@@ -96,14 +96,14 @@ void processRequest(const CStrWithSize &_newrequest, const uint16_t &_stIndex = 
                 decive_change_data[4] = msg[i] - '0';
                
                 if(changeDeviceState(decive_change_data))
-                {
-                    delay(30);
+                {                  
+                    CLOG_LN("CNF");
+                    espWaitTillFree();
                     sendDataOnWebSocket(connection_no, "OK");
                 }
                 else
                 { 
-                    CLOG_LN("NK");
-                    delay(30);
+                    CLOG_LN("NCF");
                     sendDataOnWebSocket(connection_no, "NK");
                 }
 
