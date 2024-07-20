@@ -86,7 +86,6 @@ WorkerDS F1_R1_room_map[] = {
 };
 
 
-
 // --------- MAPS ---------
 
 RoomDS room_map[] = {

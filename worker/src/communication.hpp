@@ -1,9 +1,11 @@
 #pragma once
 
-void sendBoardStatus(uint8_t * _switchs_status);
 void connectToWiFi();
-void connectToMaster();
-
+void startServer();
+void reportToMaster();
 void listenForMaster();
 
-void startServer();
+void sendBoardStatus(uint8_t * _switchs_status);
+void sendDeviceAlterReport(const uint8_t device_no, const bool new_state);
+
+

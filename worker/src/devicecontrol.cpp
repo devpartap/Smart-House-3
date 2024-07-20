@@ -1,6 +1,7 @@
 #include "definations.hpp"
 
 #include "devicecontrol.hpp"
+#include "communication.hpp"
 #include "connections_list.hpp"
 #include "ESP_EEPROM.h"
 
@@ -125,6 +126,8 @@ void listenSwitchChange()
             CLOG_LN(current_state);
 
             digitalWrite(ConnectedDevices[i].m_relay_pin,current_state);
+            
+            sendDeviceAlterReport(ConnectedDevices[i].m_eeprom_index,current_state);
 
             ConnectedDevices[i].m_switch_state = current_state;
             ConnectedDevices[i].m_relay_state = current_state;
@@ -132,7 +135,7 @@ void listenSwitchChange()
             putSavedRelayState(ConnectedDevices[i].m_eeprom_index,current_state);
             putSavedSwitchState(ConnectedDevices[i].m_eeprom_index,current_state);
             EEPROM.commit();
-            CLOG_LN("WRITING TO FLASH!");
+            CLOG_LN("WRITING TO FLASH");
 
             delay(50);
         }
@@ -157,6 +160,7 @@ void compressDevicesState(char * arry)
     for(uint8_t i = 0; i < g_no_of_devices; i++)
     {
         CLOG((uint8_t)arry[0]);
+        CLOG('-');
         tmp = ConnectedDevices[i].m_relay_state;
         tmp = tmp << (7-(i%8));
         arry[i/8] +=  tmp;
@@ -182,5 +186,6 @@ void changeDeviceState(const uint8_t deviceNo,const bool state)
     ConnectedDevices[deviceNo].m_relay_state = state;
     putSavedRelayState(ConnectedDevices[deviceNo].m_eeprom_index,state);
     EEPROM.commit();
-    CLOG_LN("WRITING TO FLASH!");
+    
+    CLOG_LN("WRITING TO FLASH!!");
 }

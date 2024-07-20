@@ -16,7 +16,7 @@ void setup()
     setupSwitches();
     setupOTA();
 
-    connectToMaster();
+    reportToMaster();
     startServer();
 
     CLOG("\n === Setup Complete! === \n\n");

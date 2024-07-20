@@ -21,7 +21,9 @@ WiFiServer server(SERVER_PORT);
 
 enum RequestType : char
 {
-    WORKERSTATUS = 'W',
+    WORKER_STATUS = 'W',
+    DEVICE_ALTER_REPORT = 'D',
+    
 };
 
 void startServer()
@@ -29,7 +31,49 @@ void startServer()
     server.begin();
 }
 
-void connectToMaster()
+void connectToWiFi()
+{
+    CLOG_LN("\n === SETTING UP WIFI ===");
+
+    WiFi.begin(g_wifi_ssid, g_wifi_password);
+    WiFi.mode(WIFI_STA);
+    
+    CLOG("Connecting");
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(400);
+        CLOG(".");
+    }
+    CLOG_LN(' ');
+
+    WiFi.localIP().toString().toCharArray(&g_ip[0],16);
+
+    CLOG("Connected, IP address: ");
+    CLOG_LN(g_ip);
+    CLOG_LN("Done");
+    
+}
+
+bool connectToMaster(WiFiClient& masterObj,uint8_t wait_time = 1)
+{
+    uint8_t loopcount = 0;
+    while (masterObj.connect(master_ip, master_port) == false)
+    {
+        if(loopcount == wait_time)
+        {
+            CLOG_LN("Master Not Connected!");
+            return false;
+        }
+
+        CLOG(".");
+        loopcount++;
+    }
+
+    CLOG_LN("Connected!");
+    return true;
+}
+
+void reportToMaster()
 {
     CLOG_LN("\n === CONNECTING TO MASTER ===");
 
@@ -47,27 +91,15 @@ void connectToMaster()
 
     WiFiClient to_master;
 
-    uint8_t loopcount = 0;
-    while (to_master.connect(master_ip, master_port) == false)
-    {
-        if(loopcount == 20)
-        {
-            CLOG_LN("Master Not Connected!");
-            return;
-        }
-
-        CLOG(".");
-        loopcount++;
-    }
-
-    CLOG_LN("Connected!");
+    if(!connectToMaster(to_master,5))
+        return;
 
     char device_Status_compressed[2+ (uint8_t)((g_no_of_devices-1)/8)];
     compressDevicesState(device_Status_compressed);
 
     to_master.print(' ');
 
-    to_master.print(RequestType::WORKERSTATUS);
+    to_master.print(RequestType::WORKER_STATUS);
 
     to_master.write(g_floor_id);
     to_master.write(g_room_id);
@@ -100,27 +132,27 @@ void connectToMaster()
     CLOG_LN("Done");
 }
 
-void connectToWiFi()
+void sendDeviceAlterReport(const uint8_t device_no, const bool new_state)
 {
-    CLOG_LN("\n === SETTING UP WIFI ===");
+    WiFiClient to_master;
 
-    WiFi.begin(g_wifi_ssid, g_wifi_password);
-    WiFi.mode(WIFI_STA);
+    if(!connectToMaster(to_master))
+        return;
     
-    CLOG("Connecting");
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(400);
-        CLOG(".");
-    }
-    CLOG_LN(' ');
+    to_master.print(' ');
 
-    WiFi.localIP().toString().toCharArray(&g_ip[0],16);
-
-    CLOG("Connected, IP address: ");
-    CLOG_LN(g_ip);
-    CLOG_LN("Done");
+    to_master.print(RequestType::DEVICE_ALTER_REPORT);
     
+    to_master.write(g_floor_id);
+    to_master.write(g_room_id);
+    to_master.write(g_board_id);
+
+    to_master.write(device_no);
+    to_master.write(new_state);
+
+    delay(10);
+    to_master.stop();
+
 }
 
 void processOrder()
@@ -146,13 +178,14 @@ void listenForMaster()
 
     if (master.connected())
     {
-        for(uint8_t i = 0; i < 200; i++)
+        for(uint8_t i = 0; i < 255; i++)
         {
             if(master.available())
             {
-                CLOG_LN("Master Here!");
                 buffer_size = master.read(rx_buffer,127);
+                master.stop();
 
+                CLOG_LN("Master Here!");
 #ifdef _DEBUG_
                 for(uint8_t i = 0; i < buffer_size;i++)
                 {
@@ -162,14 +195,10 @@ void listenForMaster()
                 CLOG_LN(' ');
 #endif
 
-                master.write('K');
-                master.stop();
-
                 processOrder();
                 break;
             }
-            delay(50);
-            CLOG_LN("checking!!");
+            delay(10);
         }
         
     }

@@ -25,6 +25,21 @@ int16_t CStrWithSize::indexOf(const CStrWithSize &_bsting, const char *_tofindin
     return -1;
 }
 
+#if ERROR_LED >= 0
+void errLED()
+{
+    digitalWrite(ERROR_LED, HIGH);
+    delay(400);
+    digitalWrite(ERROR_LED, LOW);
+    delay(400);
+    digitalWrite(ERROR_LED, HIGH);
+    delay(400);
+    digitalWrite(ERROR_LED, LOW);
+    delay(1000);
+}
+#endif
+
+
 #ifdef _DEBUG_
 void CStrWithSize::print(CStrWithSize &_bstring)
 {

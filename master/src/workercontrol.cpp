@@ -26,7 +26,7 @@ void registerWorker(const uint8_t *_worker_data)
         tmp = tmp << (uint8_t)(i % 8);
 
         if ((active_board->device_list[i] & 0b10000000) == (tmp & 0b10000000)) // here the 0 in tmp indicates off but 0 in device list
-        {                                                                             // indicates 1 so that's why using '=' instead of  '!='
+        {                                                                      // indicates 1 so that's why using '=' instead of  '!='
             active_board->device_list[i] *= -1;
         }
 
@@ -81,7 +81,17 @@ void getFloorStatus(uint8_t floor,char* to_send)
 
 }
 
-bool changeDeviceState(const uint8_t * _worker_data)
+void changeDeviceState(const uint8_t * _worker_data)
+{
+    WorkerDS *active_board = ACTIVEBOARD(_worker_data[0],_worker_data[1],_worker_data[2]);
+
+    if((_worker_data[4]) == ((active_board->device_list[_worker_data[3]] & 0b10000000) >> 7))
+    {
+        active_board->device_list[_worker_data[3]] *= -1;
+    }
+}
+
+bool updateWorkerDeviceState(const uint8_t * _worker_data)
 {
     // Discrypted char :- U| |1|.|2|.|1|.|7|.|0|
 
@@ -93,7 +103,7 @@ bool changeDeviceState(const uint8_t * _worker_data)
     }
     
     const uint8_t command[3] = {1,_worker_data[3],_worker_data[4]};
-
+    
     sendWorkerCommand((const char*)active_board->ip,command,3);
     
     if((_worker_data[4]) == ((active_board->device_list[_worker_data[3]] & 0b10000000) >> 7))

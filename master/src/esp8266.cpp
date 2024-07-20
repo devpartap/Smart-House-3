@@ -1,6 +1,41 @@
 #include "esp8266.hpp"
 
-char rx_buffer[512];
+char raw_rx_buffer[512];
+CStrWithSize buffer(&raw_rx_buffer[0],0);
+
+void espStart()
+{
+
+#if ERROR_LED >= 0
+    pinMode(ERROR_LED,OUTPUT);
+#endif
+
+    _ESP8266.begin(115200);
+    _ESP8266.setTimeout(15);
+
+    
+    FAIL_CHECK(CStrWithSize::indexOf(espSendRead("AT"), "OK")  == -1,"ESP NOT CONNECTED!");
+
+}
+
+void espSetup()
+{
+    CLOG_LN("\n=== SETTING UP ESP ===");
+
+#ifdef _DEBUG_
+    espSendRead("ATE1");
+#else
+    espSendRead("ATE0");
+#endif
+
+    delay(10);
+
+    espSendRead("AT+CWMODE_CUR=1");
+    espSendRead("AT+CIPMUX=1");
+    espSendRead("AT+CIPSERVER=1,0080");
+
+    CLOG_LN("Done!");
+}
 
 CStrWithSize espSendRead(const char *_command)
 {
@@ -24,48 +59,62 @@ CStrWithSize espWaitRead(const char * _command)
     return espRead();
 }
 
-void espWaitTillFree()
+void espWaitTillFree(bool check)
 {
-    for(uint8_t i = 0; i < 100; i++)
+    if(check)
     {
-        _ESP8266.println("AT");
-        _ESP8266.flush();
-        delay(10);
-
-        if(CStrWithSize::indexOf(espRead(),"busy") == -1)
-        {
-            break;
-        }
+        if(_ESP8266.available())
+            espRead();
+            
+        if(CStrWithSize::indexOf(espSendRead("AT"),"OK") != -1)
+            return;
     }
+
+    auto timespan = millis();
+    while((millis() - timespan) <= SEND_WAIT_TIME)
+    {
+        if(_ESP8266.available())
+        {
+            if(CStrWithSize::indexOf(espRead(),"SEND OK") != -1)
+            {
+                return;
+            }
+        }   
+    }
+
+    CLOG_LN("ESP TAKING TOO LONG");
 }
-
-// bool espWaitTill(const char * _word,const uint16_t _wait)
-// {
-//     for(uint16_t i = 0; i < _wait; i += 20)
-//     {
-//         if(_ESP8266.available())
-//         {
-//             if(CStrWithSize::indexOf(espRead(),_word) != -1 )
-//             {
-//                 return true;
-//             }
-//         }
-//         delay(20);
-//     }
-
-//     return false;
-// }
 
 CStrWithSize espRead()
 {
-#ifdef _DEBUG_
-    CStrWithSize temp(rx_buffer, _ESP8266.readBytes(rx_buffer, 512), true);
-    LOG_ESP(temp.strptr, temp.length);
-    return temp;
+    CStrWithSize temp(buffer.strptr + buffer.length,_ESP8266.readBytes(buffer.strptr + buffer.length, 512 - buffer.length), true);
+    buffer.length += temp.length + 1 ;
 
-#else
-    return CStrWithSize(rx_buffer, _ESP8266.readBytes(rx_buffer, 512), true);
+#ifdef _DEBUG_
+    LOG_ESP(temp.strptr, temp.length);
 #endif
+
+    return temp;
+}
+
+
+void espReadToPrimaryBuffer()
+{
+    if(_ESP8266.available() > REQUEST_VALID_SIZE)
+    {
+        buffer.length += _ESP8266.readBytes(buffer.strptr + buffer.length, 512 - buffer.length);
+        LOG_ESP_BUFF(buffer);
+    }
+}
+
+void eraseBuffer()
+{
+    buffer.length = 0;
+}
+
+CStrWithSize& getPrimaryBuffer()
+{
+    return buffer;
 }
 
 void espSend(const char _conection_no,const char * _msg, uint8_t _msglen)
@@ -90,11 +139,6 @@ void espSendChar(const char _conection_no,const char _msg)
     _ESP8266.print(_msg);
 }
 
-int espAvailable()
-{
-    return _ESP8266.available();
-}
-
 void espClose(char _conection_no)
 {
     _ESP8266.print("AT+CIPCLOSE=");
@@ -103,8 +147,18 @@ void espClose(char _conection_no)
 
 void espConnectAP()
 {
-    if (CStrWithSize::indexOf(espSendRead("AT+CIFSR"), "0.0.0.0") == 1)
+    CLOG_LN("\n=== Connecting To AP ===");
+    uint8_t increment = 0;
+
+    while(CStrWithSize::indexOf(espSendRead("AT+CIFSR"), "192.168") == -1)
     {
+        if(increment <= 2)
+        {
+            increment++;
+            delay(1000);
+            continue;
+        }
+
         _ESP8266.print("AT+CWJAP=\"");
         _ESP8266.print(g_wifi_ssid);
         _ESP8266.print("\",\"");
@@ -112,13 +166,25 @@ void espConnectAP()
         _ESP8266.println('"');
 
         _ESP8266.flush();
-    
+
         while(!_ESP8266.available()) { 
             delay(50);
         }
+
+        if(CStrWithSize::indexOf(espRead(),"OK") != -1)
+        {
+            CLOG_LN("Connected");
+            break;
+        } 
+
+        if(increment > 6)
+            FAIL_CHECK(true,"Could Not Connect To AP");
+
+        increment++;
+        delay(2000);
     }
 
-
+     CLOG_LN("\nDone!");
 }
 
 void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondkey)
@@ -179,7 +245,7 @@ void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t &
 
 void sendDataOnWebSocket(const char _connection_no, const char *_data)
 {
-    sendDataOnWebSocket(_connection_no,(char*)_data[0], strlen(_data));
+    sendDataOnWebSocket(_connection_no,(char*)_data, strlen(_data));
 }
 
 void connectWroker(const char* _ip)
@@ -220,33 +286,22 @@ void sendWorkerCommand(const char* _ip,const uint8_t * _command,const uint8_t _s
     _ESP8266.write(_command,_size);
     _ESP8266.flush();
 
+    // espWaitTillFree();
+
+    // _ESP8266.println("AT+CIPCLOSE=4");s why we love Rebecca from let me explain studios. She got outright permission because she knew that she didn’t want her face out. She also offered to take the video she worked for a whil
+
 }
 
-void connectToIt()
+
+void sendWebSocketPing(const char & _connection_no)
 {
-    
+    _ESP8266.print("AT+CIPSEND=");
+    _ESP8266.print(_connection_no);
+    _ESP8266.print(",");
+    _ESP8266.println(3);
+    delay(10);
+    _ESP8266.print((char)0b10001001);
+    _ESP8266.print((char)0b00000001);
+    _ESP8266.print('P');
+    _ESP8266.flush();
 }
-
-// ----- WORKS, MAYBE BE USED IN FUTURE ------
-// void sendWebsocketPing(const char & _connection_no)
-// {
-//      _ESP8266.print("AT+CIPSEND=");
-//     _ESP8266.print(_connection_no);
-//     _ESP8266.print(",");
-//     _ESP8266.println(3);
-//     delay(10);
-//     _ESP8266.print((char)0b10001001);
-//     _ESP8266.print((char)0b00000001);
-//     _ESP8266.print('P');
-//     _ESP8266.flush();
-// }
-
-// CStrWithSize espWaitRead()
-// {
-//     while (!_ESP8266.available())
-//     {
-//         delay(10);
-//     }
-
-//     return espRead();
-// }
