@@ -111,7 +111,7 @@ const switch_loading = ref(0.0)
 
 
 
-//   --- Getting Current Roomdata ---
+//   --- UI Interactive Functions ---
 
 function changeActiveRoom(_room_id)
 {
@@ -147,14 +147,24 @@ function getFloorName(_floor)
     }
 }
 
-
-
-const socket = new WebSocket('ws://192.168.29.167/a-')
-
-socket.onmessage = ({data}) => {
-    console.log("Recieved : - ", data);
+function toggleSwitch()
+{
 
 }
+
+//   --- Functions
+
+//   --- Network Functions ---
+
+const socket = new WebSocket('ws://192.168.29.167/a-')
+socket.binaryType = "arraybuffer";
+// socket.onmessage = ({data}) => {
+//     processServerMessage(data);
+// }
+
+socket.addEventListener("message", (event) => {
+    processServerMessage(event);
+});
 
 socket.onopen = () => {
     console.log("Handshake complete!")   
@@ -163,6 +173,37 @@ socket.onopen = () => {
 
 socket.onclose = () => {
     console.log("Connection Closed!")
+}
+
+function processServerMessage(event)
+{
+    console.log("Recieved : - ", event.data);
+    if (event.data instanceof ArrayBuffer) {
+    // binary frame
+    const view = new DataView(event.data);
+    console.log(view.getInt32(0));
+  } else {
+    // text frame
+    console.log(event.data);
+  }
+
+    // if(data[0] == 'D')
+    // {
+    //     const view = new DataView(data);
+    //     console.log(view.getInt32(0));
+
+
+    //     // let num = data[2] + '0'
+    //     // num += (data[3]/10)
+    //     // console.log(num);
+
+    //     // let id = "";
+    //     // id += 
+        
+
+    //     // $hp[num].devices[parseInt(data[4])].state = Boolean(data[5])
+    //     // console.log($hp[num].devices[parseInt(data[4])].state);
+    // }
 }
 
 

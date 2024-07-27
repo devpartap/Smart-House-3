@@ -20,6 +20,5 @@ void loop()
 {
     espReadToPrimaryBuffer();
     processRequest();
-
     pingActiveConnections();
 }

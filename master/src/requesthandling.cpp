@@ -206,7 +206,7 @@ void processRequest(const uint16_t &_stIndex = 0)
             {
                 if (websockets_connections[i])
                 {
-                    sendDataOnWebSocket(i + '0', requestBuffer.strptr + request_starting_pt, 6);
+                    sendDataOnWebSocket(i + '0', requestBuffer.strptr + request_starting_pt + 1, 6);
                     espWaitTillFree();
                 }
             }

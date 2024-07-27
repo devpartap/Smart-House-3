@@ -29,5 +29,4 @@ void loop()
     listenSwitchChange(); 
     
     handleOTA();
-
 }
