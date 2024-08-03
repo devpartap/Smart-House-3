@@ -93,7 +93,7 @@ void changeDeviceState(const uint8_t * _worker_data)
 
 bool updateWorkerDeviceState(const uint8_t * _worker_data)
 {
-    // Discrypted char :- U| |1|.|2|.|1|.|7|.|0|
+    // Discrypted char Format :- U| |1|.|2|.|1|.|7|.|0|
 
     WorkerDS *active_board = ACTIVEBOARD(_worker_data[0],_worker_data[1],_worker_data[2]);
 

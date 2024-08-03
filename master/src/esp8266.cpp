@@ -286,10 +286,6 @@ void sendWorkerCommand(const char* _ip,const uint8_t * _command,const uint8_t _s
     _ESP8266.write(_command,_size);
     _ESP8266.flush();
 
-    // espWaitTillFree();
-
-    // _ESP8266.println("AT+CIPCLOSE=4");s why we love Rebecca from let me explain studios. She got outright permission because she knew that she didn’t want her face out. She also offered to take the video she worked for a whil
-
 }
 
 

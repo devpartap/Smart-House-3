@@ -255,7 +255,7 @@ void pingActiveConnections()
                 if(tolog)
                     CLOG("Ping: ");
 
-                bool tolog = false;
+                tolog = false;
 #endif
                 sendWebSocketPing(i + '0');
                 websockets_connections[i] -= 1; // it will get true if pong is revieved

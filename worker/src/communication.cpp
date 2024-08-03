@@ -206,6 +206,5 @@ void listenForMaster()
     {
         master.stop();
     }
-
-    
+  
 }
