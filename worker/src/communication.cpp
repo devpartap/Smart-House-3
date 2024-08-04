@@ -14,8 +14,6 @@ uint8_t buffer_size = 0;
 const char* master_ip = "192.168.29.167";
 short master_port = 80;
 
-bool connected_to_master = false;
-
 WiFiClient *master_order;
 WiFiServer server(SERVER_PORT);
 
@@ -91,7 +89,7 @@ void reportToMaster()
 
     WiFiClient to_master;
 
-    if(!connectToMaster(to_master,5))
+    if(!connectToMaster(to_master,2))
         return;
 
     char device_Status_compressed[2+ (uint8_t)((g_no_of_devices-1)/8)];
@@ -119,7 +117,7 @@ void reportToMaster()
     char sl = to_master.read();
     if(sl == 'k')
     {
-        connected_to_master = true;
+        master_acknowledged = true;
         CLOG_LN("Master acknowledged!");
     }
     else

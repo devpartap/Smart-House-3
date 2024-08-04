@@ -1,9 +1,10 @@
 #include "definations.hpp"
 
 #include "workercontrol.hpp"
-#include "workerslayout.hpp"
-
 #include "esp8266.hpp"
+
+// Profiles
+#include "profiles/d_room.hpp"
 
 void registerWorker(const uint8_t *_worker_data)
 {

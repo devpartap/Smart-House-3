@@ -23,13 +23,23 @@ struct Device {
     Device() = delete;
 };
 
-#if _ACTIVE_BOARD(1,0,0)
+#if _ACTIVE_BOARD(0,0,0)
 
     Device ConnectedDevices[] = {
-        Device(D1,D5),
-        Device(D2,D7),
-        Device(D6,9),
-        Device(D8,10),
+        Device(D5,D0),
+        Device(D6,D1),
+        Device(D7,D2),
+        Device(D4,3), // 3 -> rx
+    };
+    const uint8_t g_no_of_devices = 4; 
+
+#elif _ACTIVE_BOARD(1,0,0)
+
+    Device ConnectedDevices[] = {
+        Device(D5,D0),
+        Device(D6,D1),
+        Device(D7,D2),
+        Device(D8,3), // 3 -> rx
         // Device(true,"D4"),
         // Device(false,"D5"),
         // Device(true,"D6"),

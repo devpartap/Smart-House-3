@@ -1,0 +1,38 @@
+{
+    "0.1":{
+        "room_id":0.1,  
+        "name":"My Room",
+        "devices":[
+            {
+                "id":1.1,
+                "name":"Light Front",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":1.2,
+                "name":"Light Back",
+                "type":"light",
+                "state":false
+            },
+            {
+                "id":1.3,
+                "name":"Fan",
+                "type":"fan",
+                "state":false
+            },
+            {
+                "id":1.4,
+                "name":"Socket",
+                "type":"socket",
+                "state":false
+            }
+        ]
+    },
+
+    "layout":{
+        "0":[
+            0.1
+        ]
+    }
+}

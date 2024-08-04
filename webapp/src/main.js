@@ -36,13 +36,13 @@ const app = createApp(App)
 // NOTE :  IMPROVE THIS PROFILING SHIT
 // - in house profile, room id is in format of (floor no) . (room no) [eg 1.2 which means it's room 2 on first floor]
 // - in house profile, device id is i frmat of (worker id) . (switch no) [eg 2.2 which means it's connected to 2nd worker and to it's 2nd switch ]
-import house_profile from '../houseprofile.json'
-console.log(house_profile)
+import profile from '../src/profiles/roomprofile.json'
+console.log(profile)
 
 
-app.provide('$hp', house_profile)
+app.provide('$hp', profile)
 app.provide('$g', {
-  active_room: 1.1,
+  active_room: 0.1,
 })
 
 // app setup
@@ -50,22 +50,4 @@ app.use(router)
 app.use(vuetify)
 app.mount('#app')
 
-// ,
-//             {
-//                 "id":1.5,
-//                 "name":"Inner Middle Strip",
-//                 "type":"light",
-//                 "state":false
-//             },
-//             {
-//                 "id":1.6,
-//                 "name":"Fan",
-//                 "type":"fan",
-//                 "state":false
-//             },
-//             {
-//                 "id":1.7,
-//                 "name":"Switch One",
-//                 "type":"switch",
-//                 "state":false
-//             }
+

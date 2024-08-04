@@ -29,6 +29,9 @@ inline void putSavedSwitchState(uint8_t _inp,uint8_t _value)
 
 inline bool getCurrentSwitchState(uint8_t _pin_no)
 {
+    if(_pin_no == 16)
+        return (bool)digitalRead(_pin_no);
+        
     return !(bool)digitalRead(_pin_no);
 }
  
@@ -64,8 +67,19 @@ void setupSwitches() // must be called after setupEEPROM()
 
     for(uint8_t i = 0; i < g_no_of_devices; i++)
     {
+        digitalWrite(ConnectedDevices[i].m_relay_pin,HIGH);
         pinMode(ConnectedDevices[i].m_relay_pin,OUTPUT);
-        pinMode(ConnectedDevices[i].m_switch_pin,INPUT_PULLUP);
+
+#ifdef _NODEMCU2_
+        if(ConnectedDevices[i].m_switch_pin == 16)
+        {
+            pinMode(16,INPUT_PULLDOWN_16);
+        }
+        else
+        {
+            pinMode(ConnectedDevices[i].m_switch_pin,INPUT_PULLUP);
+        }
+#endif
 
         ConnectedDevices[i].m_switch_state = getCurrentSwitchState(ConnectedDevices[i].m_switch_pin);
         ConnectedDevices[i].m_eeprom_index = i;
@@ -127,7 +141,10 @@ void listenSwitchChange()
 
             digitalWrite(ConnectedDevices[i].m_relay_pin,current_state);
             
-            sendDeviceAlterReport(ConnectedDevices[i].m_eeprom_index,current_state);
+            if(master_acknowledged)
+            {
+                sendDeviceAlterReport(ConnectedDevices[i].m_eeprom_index,current_state);
+            }
 
             ConnectedDevices[i].m_switch_state = current_state;
             ConnectedDevices[i].m_relay_state = current_state;

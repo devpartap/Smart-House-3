@@ -181,7 +181,7 @@ function processServerMessage(data)
         console.log(index);
         
         $hp.value[index].devices[data.charCodeAt(4)].state = Boolean(data.charCodeAt(5))
-        console.log($hp.value[index].devices[charCodeAt(4)].state);
+        console.log($hp.value[index].devices[data.charCodeAt(4)].state);
     }
 }
 

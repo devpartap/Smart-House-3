@@ -137,6 +137,15 @@ void processRequest(const uint16_t &_stIndex = 0)
                         CLOG_LN("NCF");
                         sendDataOnWebSocket(connection_no, "NK");
                     }
+
+                    for (uint8_t i = 0; i < 4; i++)
+                    {
+                        if ((i != connection_no) && (websockets_connections[i]))
+                        {
+                            espWaitTillFree();
+                            sendDataOnWebSocket(i + '0', requestBuffer.strptr + request_starting_pt + 1, 6);
+                        }
+                    }
                 }
 
                 if ((request_length - 6 - websocket_msg_offset) > msg_len)

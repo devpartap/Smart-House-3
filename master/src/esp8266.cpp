@@ -91,7 +91,7 @@ CStrWithSize espRead()
     buffer.length += temp.length + 1 ;
 
 #ifdef _DEBUG_
-    LOG_ESP(temp.strptr, temp.length);
+    LOG_ESP_BUFF(temp);
 #endif
 
     return temp;
