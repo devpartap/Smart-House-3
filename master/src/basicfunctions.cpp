@@ -41,12 +41,24 @@ void errLED()
 
 
 #ifdef _DEBUG_
-void CStrWithSize::print(CStrWithSize &_bstring)
+void CStrWithSize::print(CStrWithSize &_bstring,bool inchar = true)
 {
-    for (uint16_t i = 0; i < _bstring.length; i++)
+    if(inchar)
     {
-        CLOG(_bstring.strptr[i]);
+        for (uint16_t i = 0; i < _bstring.length; i++)
+        {
+            CLOG(_bstring.strptr[i]);
+        }
     }
+    else
+    {
+        for (uint16_t i = 0; i < _bstring.length; i++)
+        {
+            CLOG((uint8_t)_bstring.strptr[i]);
+            CLOG('-');
+        }
+    }
+    
     CLOG('\n');
 }
 

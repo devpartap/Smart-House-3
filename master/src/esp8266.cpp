@@ -75,7 +75,12 @@ void espWaitTillFree(bool check)
     {
         if(_ESP8266.available())
         {
-            if(CStrWithSize::indexOf(espRead(),"SEND OK") != -1)
+            CStrWithSize data = espRead();
+            if(CStrWithSize::indexOf(data,"SEND OK") != -1)
+            {
+                return;
+            }
+            else if(CStrWithSize::indexOf(data,"ERROR") != -1)
             {
                 return;
             }

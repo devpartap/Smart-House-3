@@ -94,7 +94,7 @@ struct CStrWithSize
     static int16_t indexOf(const CStrWithSize &_bsting, const char *_tofindindex, const uint16_t &_stIndex = 0);
 
 #ifdef _DEBUG_
-    static void print(CStrWithSize &_bstring);
+    static void print(CStrWithSize &_bstring,bool inchar = true);
 #endif
 };
 

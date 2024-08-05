@@ -21,17 +21,17 @@ enum Request : const char
     WORKER_ALTER_DEVICE = 'D'
 };
 
-void processRequest(const uint16_t &_stIndex = 0)
+void processRequest(uint16_t _stIndex = 0)
 {
     bool recursing = false;
 
+    if ((requestBuffer.length - _stIndex) < REQUEST_VALID_SIZE)
+    {
+        return;
+    }
+
     while (true)
     {
-
-        if ((requestBuffer.length - _stIndex) < REQUEST_VALID_SIZE)
-        {
-            return;
-        }
 
         int16_t start_index = CStrWithSize::indexOf(requestBuffer, "+IPD", _stIndex);
         if (start_index == -1)
@@ -140,7 +140,7 @@ void processRequest(const uint16_t &_stIndex = 0)
 
                     for (uint8_t i = 0; i < 4; i++)
                     {
-                        if ((i != connection_no) && (websockets_connections[i]))
+                        if ((i != (connection_no - '0')) && (websockets_connections[i]))
                         {
                             espWaitTillFree();
                             sendDataOnWebSocket(i + '0', requestBuffer.strptr + request_starting_pt + 1, 6);
@@ -220,7 +220,7 @@ void processRequest(const uint16_t &_stIndex = 0)
                 }
             }
             CLOG_LN("sending device");
-            changeDeviceState((uint8_t *)requestBuffer.strptr + request_starting_pt + 1);
+            changeDeviceState((uint8_t *)requestBuffer.strptr + request_starting_pt + 2);
         }
         else
         {
@@ -237,7 +237,8 @@ void processRequest(const uint16_t &_stIndex = 0)
             CLOG_LN(request_length);
 
             recursing = true;
-            processRequest(request_length + start_index);
+            // processRequest(request_length + start_index);
+            _stIndex = request_length + request_starting_pt;
             continue;
         }
 

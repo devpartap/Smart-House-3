@@ -90,6 +90,16 @@ void changeDeviceState(const uint8_t * _worker_data)
     {
         active_board->device_list[_worker_data[3]] *= -1;
     }
+    
+#ifdef _DEBUG_
+    CLOG_LN("Device State :- ");
+    for(uint8_t i = 0; i < active_board->no_of_devices; i++)
+    {
+        CLOG(active_board->device_list[i]);
+        CLOG('-');
+    }
+    CLOG_LN(" ");
+#endif
 }
 
 bool updateWorkerDeviceState(const uint8_t * _worker_data)

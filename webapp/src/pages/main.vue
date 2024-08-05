@@ -156,7 +156,7 @@ function toggleSwitch()
 
 //   --- Network Functions ---
 
-const socket = new WebSocket('ws://192.168.29.167/a-')
+const socket = new WebSocket('ws://192.168.29.167:0080/')
 
 socket.addEventListener("message", (event) => {
     processServerMessage(event.data);
@@ -167,8 +167,13 @@ socket.onopen = () => {
     askFloorStatus()
 }
 
-socket.onclose = () => {
+socket.onclose = (msg) => {
+    console.log(msg);
     console.log("Connection Closed!")
+}
+
+socket.onerror = (err) => {
+    console.log(err);
 }
 
 function processServerMessage(data)
@@ -191,7 +196,8 @@ function sendDataOnWS(_data)
     return new Promise(function(resolve,reject) {
         socket.send(_data);
         socket.onmessage = (receved_Data) => {
-            if(receved_Data[0] == 'NK')
+            
+            if(receved_Data.data[0] == 'N')
             {
                 reject(receved_Data)
             }
@@ -236,7 +242,7 @@ async function askFloorStatus()
             })
         })
         console.log(responce.data)
-        console.log($hp.value['1.1'].devices)
+        console.log($hp.value['0.1'].devices) // please keep it in yr fkin mind i spend whole day debugging and found this was manual
 
         b_ready_to_use.value = true;
 

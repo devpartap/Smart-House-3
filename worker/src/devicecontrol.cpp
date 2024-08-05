@@ -6,7 +6,7 @@
 #include "ESP_EEPROM.h"
 
 
-// --- Inline Functions ---
+// --- Resource Functions ---
 inline uint8_t getSavedRelayState(uint8_t _inp)
 {
     return EEPROM.read((_inp * 2) + 1);
@@ -27,14 +27,20 @@ inline void putSavedSwitchState(uint8_t _inp,uint8_t _value)
     EEPROM.write((_inp * 2) + 2,_value);
 }
 
+inline void setRelayState(const uint8_t pin, bool state)
+{
+    digitalWrite(pin,!state);
+}
+
 inline bool getCurrentSwitchState(uint8_t _pin_no)
 {
     if(_pin_no == 16)
+    {
         return (bool)digitalRead(_pin_no);
-        
+    }        
     return !(bool)digitalRead(_pin_no);
 }
- 
+
 // --- Setup Functions ---
 void setupEEPROM()
 {
@@ -67,7 +73,7 @@ void setupSwitches() // must be called after setupEEPROM()
 
     for(uint8_t i = 0; i < g_no_of_devices; i++)
     {
-        digitalWrite(ConnectedDevices[i].m_relay_pin,HIGH);
+        setRelayState(ConnectedDevices[i].m_relay_pin,LOW);
         pinMode(ConnectedDevices[i].m_relay_pin,OUTPUT);
 
 #ifdef _NODEMCU2_
@@ -114,7 +120,7 @@ void setupSwitches() // must be called after setupEEPROM()
             to_commit = true;
         }
         
-        digitalWrite(ConnectedDevices[i].m_relay_pin,ConnectedDevices[i].m_relay_state);
+        setRelayState(ConnectedDevices[i].m_relay_pin,ConnectedDevices[i].m_relay_state);
     }
 
     if(to_commit)
@@ -139,7 +145,7 @@ void listenSwitchChange()
             CLOG(" to ");
             CLOG_LN(current_state);
 
-            digitalWrite(ConnectedDevices[i].m_relay_pin,current_state);
+            setRelayState(ConnectedDevices[i].m_relay_pin,current_state);
             
             if(master_acknowledged)
             {
@@ -198,7 +204,7 @@ void compressDevicesState(char * arry)
 
 void changeDeviceState(const uint8_t deviceNo,const bool state)
 {
-    digitalWrite(ConnectedDevices[deviceNo].m_relay_pin,state);
+    setRelayState(ConnectedDevices[deviceNo].m_relay_pin,state);
 
     ConnectedDevices[deviceNo].m_relay_state = state;
     putSavedRelayState(ConnectedDevices[deviceNo].m_eeprom_index,state);

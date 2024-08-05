@@ -5,26 +5,26 @@
         "devices":[
             {
                 "id":1.1,
+                "name":"Socket",
+                "type":"socket",
+                "state":false
+            },
+            {
+                "id":1.2,
                 "name":"Light Front",
                 "type":"light",
                 "state":false
             },
             {
-                "id":1.2,
+                "id":1.3,
                 "name":"Light Back",
                 "type":"light",
                 "state":false
             },
             {
-                "id":1.3,
+                "id":1.4,
                 "name":"Fan",
                 "type":"fan",
-                "state":false
-            },
-            {
-                "id":1.4,
-                "name":"Socket",
-                "type":"socket",
                 "state":false
             }
         ]

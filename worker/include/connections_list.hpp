@@ -26,12 +26,11 @@ struct Device {
 #if _ACTIVE_BOARD(0,0,0)
 
     Device ConnectedDevices[] = {
-        Device(D5,D0),
-        Device(D6,D1),
-        Device(D7,D2),
-        Device(D4,3), // 3 -> rx
+        Device(D3,D0),
+        Device(D5,D1),
+        Device(D6,D2),
+        Device(D7,D9),
     };
-    const uint8_t g_no_of_devices = 4; 
 
 #elif _ACTIVE_BOARD(1,0,0)
 
@@ -44,7 +43,6 @@ struct Device {
         // Device(false,"D5"),
         // Device(true,"D6"),
     };
-    const uint8_t g_no_of_devices = 4; 
 
 #elif _ACTIVE_BOARD(1,1,0)
 
@@ -60,6 +58,6 @@ struct Device {
         Device(true,"D8")
     };
 
-    const uint8_t g_no_of_devices = 9; 
-
 #endif
+
+const uint8_t g_no_of_devices = sizeof(ConnectedDevices) / sizeof(Device);
