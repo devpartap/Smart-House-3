@@ -4,15 +4,10 @@
 #include "definations.hpp"
 #include "devicecontrol.hpp"
 
-#define SERVER_PORT 8080
-
 uint8_t rx_buffer[128] = {0};
 uint8_t buffer_size = 0;
 
-
-
-const char* master_ip = "192.168.29.167";
-short master_port = 80;
+bool initial_report = true;
 
 WiFiClient *master_order;
 WiFiServer server(SERVER_PORT);
@@ -52,44 +47,55 @@ void connectToWiFi()
     
 }
 
-bool connectToMaster(WiFiClient& masterObj,uint8_t wait_time = 1)
+inline bool connectToMaster(WiFiClient& masterObj)
 {
-    uint8_t loopcount = 0;
-    while (masterObj.connect(master_ip, master_port) == false)
-    {
-        if(loopcount == wait_time)
-        {
-            CLOG_LN("Master Not Connected!");
-            return false;
-        }
 
-        CLOG(".");
-        loopcount++;
+#ifdef _DEBUG_
+    bool status = masterObj.connect(master_ip, master_port);
+
+    if(status)
+    {
+        CLOG_LN("Connected!");  
+    }
+    else
+    {
+        CLOG_LN("Master Not Connected!");
     }
 
-    CLOG_LN("Connected!");
-    return true;
+    return status;
+#endif
+
+    return masterObj.connect(master_ip, master_port);
 }
 
 void reportToMaster()
 {
-    CLOG_LN("\n === CONNECTING TO MASTER ===");
+    WiFiClient to_master;
+    if(initial_report)
+    {
 
-    randomSeed(analogRead(RANDOM_SEED_PIN));
+        CLOG_LN("\n === CONNECTING TO MASTER ===");
+
+        randomSeed(analogRead(RANDOM_SEED_PIN));
 #ifdef _DEBUG_
-    uint16 max_arrange_time = random(100,MAX_ARRANGE_TIME);
-    CLOG("Wait : ");
-    CLOG_LN(max_arrange_time);
-    delay(random(100,max_arrange_time));
+        uint16 max_arrange_time = random(100,MAX_RANDOM_WAIT);
+        CLOG("Wait : ");
+        CLOG_LN(max_arrange_time);
+        delay(random(100,max_arrange_time));
 
 #else
-    delay(random(100,MAX_ARRANGE_TIME));
+        delay(random(100,MAX_RANDOM_WAIT));
     
 #endif
-
-    WiFiClient to_master;
-
-    if(!connectToMaster(to_master,2))
+        initial_report = false;
+        to_master.setTimeout(2000);
+    }
+    else
+    {
+        to_master.setTimeout(MASTER_TIMEOUT_INLOOP);
+    }
+    
+    if(!connectToMaster(to_master))
         return;
 
     char device_Status_compressed[2+ (uint8_t)((g_no_of_devices-1)/8)];
@@ -133,9 +139,13 @@ void reportToMaster()
 void sendDeviceAlterReport(const uint8_t device_no, const bool new_state)
 {
     WiFiClient to_master;
+    to_master.setTimeout(MASTER_TIMEOUT_INLOOP);
 
     if(!connectToMaster(to_master))
+    {
+        master_acknowledged = false;
         return;
+    }
     
     to_master.print(' ');
 

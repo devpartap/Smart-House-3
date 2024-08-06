@@ -22,7 +22,7 @@ void espConnectAP();
 
 void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondkey);
 void sendDataOnWebSocket(const char _connection_no, const char *_data);
-void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t & _size);
+void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t & _size,char _command = ' ');
 void sendWebSocketPing(const char & _ConnectionNO);
 
 void sendWorkerCommand(const char* _ip,const uint8_t * _command,const uint8_t _size);

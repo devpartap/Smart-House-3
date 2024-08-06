@@ -1,4 +1,3 @@
-#define _DEBUG_
 
 #include "definations.hpp"
 #include "communication.hpp"
@@ -27,6 +26,11 @@ void loop()
 {
     listenForMaster();
     listenSwitchChange(); 
-    
+
+    if(!master_acknowledged)
+    {
+        reportToMaster();
+    }
+
     handleOTA();
 }

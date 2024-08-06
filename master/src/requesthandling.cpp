@@ -143,7 +143,7 @@ void processRequest(uint16_t _stIndex = 0)
                         if ((i != (connection_no - '0')) && (websockets_connections[i]))
                         {
                             espWaitTillFree();
-                            sendDataOnWebSocket(i + '0', requestBuffer.strptr + request_starting_pt + 1, 6);
+                            sendDataOnWebSocket(i + '0', (char*)decive_change_data, 6,'D');
                         }
                     }
                 }

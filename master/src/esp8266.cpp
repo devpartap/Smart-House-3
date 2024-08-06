@@ -215,8 +215,9 @@ void espConnectWebSocket(const char _conection_no, const CStrWithSize &_respondk
     _ESP8266.flush();
 }
 
-void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t & _size)
+void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t & _size,char _command = ' ')
 {
+
     _ESP8266.print("AT+CIPSEND=");
     _ESP8266.print(_connection_no);
     _ESP8266.print(",");
@@ -242,7 +243,12 @@ void sendDataOnWebSocket(const char _connection_no, char *_data,const uint16_t &
     {
         _ESP8266.print((char)(_size));
     }
-       
+
+    if(_command != ' ')
+    {
+        _ESP8266.print(_command);
+    }
+    
     _ESP8266.write(_data,_size);
 
     _ESP8266.flush();
@@ -274,6 +280,7 @@ void connectWroker(const char* _ip)
 
 void sendWorkerCommand(const char* _ip,const uint8_t * _command,const uint8_t _size)
 {
+    espWaitTillFree(true);
     connectWroker(_ip);
 
     _ESP8266.print("AT+CIPSEND=4,");

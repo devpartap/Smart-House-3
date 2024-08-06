@@ -3,7 +3,7 @@
 
 // --- OPTIONS ---
 
-#define _DEBUG_
+// #define _DEBUG_
 #define _NODEMCU2_
 
 #define _ACTIVE_BOARD_FLOORID_ 0
@@ -11,8 +11,10 @@
 #define _ACTIVE_BOARD_ID_      0
 
 #define RANDOM_SEED_PIN A0
-#define MAX_ARRANGE_TIME 1000
+#define MAX_RANDOM_WAIT 1000
 #define OTA_PORT 8266
+#define SERVER_PORT 8080
+#define MASTER_TIMEOUT_INLOOP 400
 
 // --- CONSTANTS ---
 
@@ -21,6 +23,9 @@
 inline char g_wifi_ssid[] = {'H','a','r','v','i','n','d','e','r',' ','S','i','n','g','h','\0'};
 inline char g_wifi_password[] = {'g','u','r','j','o','t','2','0','5','0','\0'};
 inline char g_ip[16];
+
+inline const char* master_ip = "192.168.29.167";
+inline short master_port = 80;
 
 inline bool master_acknowledged = false;
 
